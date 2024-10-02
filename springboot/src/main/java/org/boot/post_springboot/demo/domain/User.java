@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
@@ -21,12 +20,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    @Column(nullable = false, unique = true)
+    private String username;
+
+    @Column(nullable = false, unique = true)
     private String nickname;
 
+    @Column(nullable = false, unique = true)
     private String userEmail;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     @CreationTimestamp
     private LocalDateTime created_at;
 
