@@ -1,0 +1,5 @@
+-- -- 사용자 생성 SQL
+-- CREATE USER postuser WITH PASSWORD 'postuser';
+--
+-- -- 권한 부여 SQL
+-- GRANT ALL PRIVILEGES ON DATABASE postdb TO postuser;
