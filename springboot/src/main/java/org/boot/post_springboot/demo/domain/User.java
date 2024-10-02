@@ -4,8 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Builder
 @Entity
@@ -21,10 +25,10 @@ public class User {
     private Long userId;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String userName;
 
     @Column(nullable = false, unique = true)
-    private String nickname;
+    private String nickName;
 
     @Column(nullable = false, unique = true)
     private String userEmail;
@@ -33,11 +37,14 @@ public class User {
     private String password;
 
     @Column(nullable = false)
+    private String role;
+
+    @Column(nullable = false)
     @CreationTimestamp
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 
 
 

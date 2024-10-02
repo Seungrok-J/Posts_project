@@ -66,7 +66,7 @@ public class Comments {
 
     // 댓글 작성자의 닉네임을 가져오는 메서드
     public String getNickName() {
-        return this.user.getNickname();
+        return this.user.getNickName();
     }
 
     // 대댓글 여부 확인 메서드
