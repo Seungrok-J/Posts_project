@@ -11,9 +11,7 @@ import org.boot.post_springboot.demo.domain.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUserEmail(String userEmail);
-    Optional<User> findByUserId(String userName);
+    Optional<User> findByUserId(Long userId);
 
-    boolean exexistsByNickName(String nickName);
-    boolean exexistsByUserEmail(String userEmail);
 
 }
