@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDto {
+public class UserDTO {
     private Long userId;
     private String userEmail;
     private String password;
@@ -21,8 +21,8 @@ public class UserDto {
     private String userName;
     private String nickName;
 
-    public static UserDto of(User user){
-        UserDto userDto = new UserDto();
+    public static UserDTO of(User user){
+        UserDTO userDto = new UserDTO();
         userDto.setUserId(user.getUserId());
         userDto.setUserEmail(user.getUserEmail());
         userDto.setPassword(user.getPassword());

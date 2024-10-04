@@ -31,6 +31,8 @@ public class Posts {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    private String fileName;
+
     private String filePath;
 
     // 조회수
