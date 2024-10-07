@@ -51,5 +51,8 @@ public class Boards {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "cate_id")
+    private Categories category;
 
 }
