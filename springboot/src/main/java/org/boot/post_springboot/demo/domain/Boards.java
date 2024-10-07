@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "posts")
-public class Posts {
+@Table(name = "Boards")
+public class Boards {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postId;
+    private Long boardId;
 
     @Column(nullable = false)
     private String title;

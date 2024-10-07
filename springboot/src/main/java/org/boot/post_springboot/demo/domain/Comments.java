@@ -36,8 +36,8 @@ public class Comments {
     private Long commentsId;
 
     @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
-    private Posts post;
+    @JoinColumn(name = "board_id", nullable = false)
+    private Boards boards;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

@@ -17,10 +17,10 @@ public class UserService {
 
     // 회원가입 기능
     public User registerUser(User user) throws Exception {
-        if (userRepository.existexistsByNickName(user.getNickName())) {
+        if (userRepository.existsByNickName(user.getNickName())) {
             throw new Exception("사용중인 닉네임 입니다.");
         }
-        if (userRepository.exiexistsByUserEmail(user.getUserEmail())) {
+        if (userRepository.existsByUserEmail(user.getUserEmail())) {
             throw new Exception("사용중인 이메일 입니다.");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
