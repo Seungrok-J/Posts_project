@@ -30,14 +30,14 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/", "/home", "/public/**").permitAll()
                         .anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .permitAll())
+//                .formLogin(form -> form
+//                        .loginPage("/login")
+//                        .permitAll())
                 .logout(LogoutConfigurer::permitAll)
                 .sessionManagement(management -> management
                         .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
@@ -50,19 +50,19 @@ public class WebSecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*")); // 모든 도메인에서의 접근을 허용
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용된 HTTP 메소드
-        configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
-        configuration.setAllowCredentials(true); // 크레덴셜 허용
-        configuration.setMaxAge(3600L); // 사전 요청(precache) 결과를 3600초 동안 캐시
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 CORS 설정 적용
-        return source;
-    }
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("*")); // 모든 도메인에서의 접근을 허용
+//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용된 HTTP 메소드
+//        configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
+//        configuration.setAllowCredentials(true); // 크레덴셜 허용
+//        configuration.setMaxAge(3600L); // 사전 요청(precache) 결과를 3600초 동안 캐시
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 CORS 설정 적용
+//        return source;
+//    }
 
     @Bean
     public SessionAuthenticationStrategy sessionAuthenticationStrategy() {

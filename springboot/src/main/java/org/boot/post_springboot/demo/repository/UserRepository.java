@@ -9,6 +9,6 @@ import org.boot.post_springboot.demo.domain.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    boolean existsByNickName(String nickName);
-    boolean existsByUserEmail(String userEmail);
+//    boolean existsByNickName(String nickName);
+//    boolean existsByUserEmail(String userEmail);
 }

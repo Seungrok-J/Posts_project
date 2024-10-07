@@ -58,7 +58,6 @@ public class Comments {
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @Column(nullable = false)
