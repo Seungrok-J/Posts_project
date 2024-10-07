@@ -1,11 +1,11 @@
 import React from 'react';
 
-const main = () => {
+const home = () => {
   return (
     <div>
-
+      홈페이지
     </div>
   );
 };
 
-export default main;
+export default home;
