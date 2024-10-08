@@ -27,14 +27,13 @@ import org.springframework.security.core.userdetails.User.UserBuilder;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-<<<<<<< HEAD
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/", "/home", "/public/**","/emailCheck","/verifyToken").permitAll()
+                        .requestMatchers("/", "/home", "/public/**", "/emailCheck", "/verifyToken").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -47,7 +46,6 @@ public class WebSecurityConfig {
                         .maximumSessions(1)
                         .expiredUrl("/login?expired")
                         .maxSessionsPreventsLogin(true));
-=======
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 //        http
@@ -83,24 +81,23 @@ public class WebSecurityConfig {
 //                        .expiredUrl("/login?expired")
 //                        // 최대 세션 수 초과 시 로그인 방지 설정: 이미 로그인이 되어 있는 경우 새로운 로그인 시도 방지
 //                        .maxSessionsPreventsLogin(true)
-//                );
-//        return http.build();
-//    }
->>>>>>> main
 
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(Arrays.asList("*")); // 모든 도메인에서의 접근을 허용
-//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용된 HTTP 메소드
-//        configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
-//        configuration.setAllowCredentials(true); // 크레덴셜 허용
-//        configuration.setMaxAge(3600L); // 사전 요청(precache) 결과를 3600초 동안 캐시
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 CORS 설정 적용
-//        return source;
-//    }
+        return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*")); // 모든 도메인에서의 접근을 허용
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용된 HTTP 메소드
+        configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
+        configuration.setAllowCredentials(true); // 크레덴셜 허용
+        configuration.setMaxAge(3600L); // 사전 요청(precache) 결과를 3600초 동안 캐시
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration); // 모든 경로에 대해 CORS 설정 적용
+        return source;
+    }
 
     @Bean
     public SessionAuthenticationStrategy sessionAuthenticationStrategy() {
