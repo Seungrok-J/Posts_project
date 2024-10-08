@@ -1,48 +1,105 @@
 package org.boot.post_springboot.demo.controller;
 
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.boot.post_springboot.demo.domain.Boards;
-import org.boot.post_springboot.demo.service.BoardService;
-import org.boot.post_springboot.demo.service.FileService;
-import org.springframework.stereotype.Controller;
+import org.boot.post_springboot.demo.domain.Categories;
+import org.boot.post_springboot.demo.domain.User;
+import org.boot.post_springboot.demo.service.BoardsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("api/board")
+@RequestMapping("/api/board")
 @RequiredArgsConstructor
 public class BoardController {
 
-    //    private final FileService fileService; // 파일서비스 의존성 주입
-    private final BoardService boardService;
-    //
-    private static final int BLOCK_PAGE_NUM_COUNT = 5; // 블럭에 존재하는 페이지 번호 수
-    private static final int PAGE_POST_COUNT = 4; // 한 페이지에 존재하는 게시글 수
-    // 글 작성기능
+    @Autowired
+    private BoardsService boardsService;
+
+//    @Autowired
+
+    //     글 작성기능
+    @PostMapping("/save")
+    public ResponseEntity<Boards> save(@RequestBody Boards boards) {
+        try {
+            // 게시물 저장
+            Boards savedBoard = boardsService.saveBoard(boards);
+            return ResponseEntity.ok(savedBoard); // 작성된 게시물을 반환
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 인증되지 않은 경우 401 응답
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 서버 오류 500 응답
+        }
+    }
+
 
     // 글 삭제기능
+    @GetMapping("/{boardId}/delete") // 현재는 값을 직접 줘서 get으로 진행 추후 프론트 진행 시, DeleteMapping로 변경
+    public ResponseEntity<Boards> delete(@PathVariable Long boardId) {
+        try {
+            // 게시물 수정
+            boardsService.deleteBoard(boardId);
+            return ResponseEntity.ok().build();
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 권한 없음 401 응답
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 게시물 없음 404 응답
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 서버 오류 500 응답
+        }
+
+    }
+
 
     // 글 수정기능
+    @GetMapping("/{boardId}/update")// 현재는 값을 직접 줘서 get으로 진행 추후 프론트 진행 시, PutMapping로 변경
+    public ResponseEntity<Boards> update(@PathVariable Long boardId, @RequestBody Boards boards) {
+        try {
+            // 게시물 수정
+            Boards updatedBoard = boardsService.updateBoard(boardId, boards);
+            return ResponseEntity.ok(updatedBoard); // 수정된 게시물 반환
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // 권한 없음 401 응답
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 게시물 없음 404 응답
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 서버 오류 500 응답
+        }
+    }
 
     // 글 상세보기 기능
-
+    @GetMapping("/{boardId}/detail")
+    public Boards getBoard(@PathVariable Long boardId) {
+        Boards board = boardsService.getBoardById(boardId);
+        return board;
+    }
 
     // 게시판 목록보기 기능
     @GetMapping("/list")
-    public List<Boards> boardList() {
-        // boardList를 호출하여 게시글 목록 반환
-
-        return boardService.boardList();
+    public List<Boards> getAllBoards() {
+        return boardsService.getAllBoards();
     }
 
-    // 카테고리 별 글 보기 기능
 
-    //유저 별 글 보기 기능
+//     카테고리 별 글 보기 기능
 
+    @GetMapping("/list/{cateId}")
+    public List<Boards> getBoardsByCateId(@PathVariable("cateId") Long cateId) {
+        return boardsService.findAllByCategory(cateId);
+    }
+
+    // 유저 별 글 보기 기능(마이페이지)
+    @GetMapping("/{userId}/boardList")
+    public List<Boards> getBoardsByUserId(@PathVariable("userId") Long userId) {
+        return boardsService.findAllByUser(userId);
+    }
 
 }
