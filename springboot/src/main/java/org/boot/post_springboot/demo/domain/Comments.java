@@ -58,10 +58,11 @@ public class Comments {
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @Column(nullable = false)
-    private int likeCount = 0;
+    private int likeCount;
 
     // 댓글 작성자의 닉네임을 가져오는 메서드
     public String getNickName() {
