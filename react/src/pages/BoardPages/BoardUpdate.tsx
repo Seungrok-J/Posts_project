@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EditPost = () => {
+const BoardUpdate = () => {
   return (
     <div>
       게시물 수정 페이지
@@ -8,4 +8,4 @@ const EditPost = () => {
   );
 };
 
-export default EditPost;
+export default BoardUpdate;

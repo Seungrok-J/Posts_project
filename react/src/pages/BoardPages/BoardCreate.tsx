@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CreatePost = () => {
+const BoardCreate = () => {
   return (
     <div>
       게시물 생성 페이지
@@ -8,4 +8,4 @@ const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default BoardCreate;

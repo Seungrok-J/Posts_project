@@ -16,9 +16,9 @@ const ProfilePage = lazy(() => import('../pages/AuthPages/UserDetail'));
 
 // ---> Board Pages
 const BoardPage = lazy(() => import('../pages/BoardPages/Board'))
-const CreatePostPage = lazy(() => import('../pages/BoardPages/CreatePost'))
-const EditPostPage = lazy(() => import('../pages/BoardPages/EditPost'))
-const PostPage = lazy(() => import('../pages/BoardPages/Post'))
+const CreatePostPage = lazy(() => import('../pages/BoardPages/BoardCreate'))
+const EditPostPage = lazy(() => import('../pages/BoardPages/BoardUpdate'))
+const PostPage = lazy(() => import('../pages/BoardPages/BoardDetail'))
 
 
 // ---> Error Pages
@@ -42,9 +42,9 @@ export const AppRoutes = () => {
 							<Route path={PATH.REGISTER} element={<RegisterPage />} />
 							<Route path={PATH.PROFILE} element={<ProfilePage />} />
 							<Route path={PATH.BOARD} element={<BoardPage />} />
-							<Route path={PATH.POST_CRE} element={<CreatePostPage />} />
-							<Route path={PATH.POST_EDIT} element={<EditPostPage />} />
-							<Route path={PATH.POST} element={<PostPage />} />
+							<Route path={PATH.BOARD_SAVE} element={<CreatePostPage />} />
+							<Route path={PATH.BOARD_UPDATE} element={<EditPostPage />} />
+							<Route path={PATH.BOARD_DETAIL} element={<PostPage />} />
 							<Route path="*" element={<NotFoundPage />} />
 						</Routes>
 					</Suspense>

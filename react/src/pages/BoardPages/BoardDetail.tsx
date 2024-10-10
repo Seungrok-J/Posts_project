@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Post = () => {
+const BoardDetail = () => {
   return (
     <div>
       게시글 페이지
@@ -8,4 +8,4 @@ const Post = () => {
   );
 };
 
-export default Post;
+export default BoardDetail;
