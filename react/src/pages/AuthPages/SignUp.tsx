@@ -45,7 +45,7 @@ function SignUpPage() {
 		}
 
 		try {
-			const response = await api.post('/users/register', formData);
+			const response = await api.post('/auth/register', formData);
 			setMessage('Registration successful!');
 			setTimeout(() => {
 				navigate(PATH.LOGIN);
@@ -85,7 +85,7 @@ function SignUpPage() {
 
 	const checkNicknameAvailability = async () => {
 			try {
-				const response = await api.get(`/users/isExist/${formData.nickName}`);
+				const response = await api.get(`/auth/isExist/${formData.nickName}`);
 
 				if (response.data) {
 					setNicknameAvailable(false);
