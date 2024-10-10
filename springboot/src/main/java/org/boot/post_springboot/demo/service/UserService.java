@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -25,17 +27,18 @@ public class UserService {
         return passwordEncoder.encode(password);
     }
 
-    // 회원가입 기능
-    public User registerUser(User user) throws Exception {
-        if (userRepository.existsByNickName(user.getNickName())) {
-            throw new Exception("사용중인 닉네임 입니다.");
-        }
-        if (userRepository.existsByUserEmail(user.getUserEmail())) {
-            throw new Exception("사용중인 이메일 입니다.");
-        }
+    public boolean checkNickname(String nickname) {
+        return userRepository.existsByNickName(nickname);
+    }
+
+    public Optional<User> findByUserEmail(String userEmail) {
+        Optional<User> userOpt = userRepository.findByUserEmail(userEmail);
+        return userOpt;
+    }
+
+    public User saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
-
     }
 
 }

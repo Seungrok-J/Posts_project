@@ -3,11 +3,13 @@ package org.boot.post_springboot.demo.controller;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.domain.VerificationToken;
 import org.boot.post_springboot.demo.dto.MailDTO;
 import org.boot.post_springboot.demo.dto.VerificationRequestDTO;
 import org.boot.post_springboot.demo.repository.VerificationTokenRepository;
 import org.boot.post_springboot.demo.service.EmailService;
+import org.boot.post_springboot.demo.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,16 +20,22 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class MailController {
     private final EmailService emailService;
+    private final UserService userService;
     private final VerificationTokenRepository verificationTokenRepository;
 
     @PostMapping("/emailCheck")
-    public ResponseEntity<String> emailCheck(@RequestBody MailDTO mailDTO) throws MessagingException, UnsupportedEncodingException {
+    public ResponseEntity<String> emailCheck(@RequestBody MailDTO mailDTO, User user) throws MessagingException, UnsupportedEncodingException {
+        Optional<User> existingUser = userService.findByUserEmail(user.getUserEmail());
+        if(existingUser.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
+        }
         String authCode = emailService.sendSimpleMessage(mailDTO.getEmail());
         String token = emailService.createVerificationToken(mailDTO.getEmail(), authCode);  // 토큰 생성 및 저장
         return ResponseEntity.ok(authCode);

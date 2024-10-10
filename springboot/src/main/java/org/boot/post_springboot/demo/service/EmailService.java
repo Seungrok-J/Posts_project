@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.boot.post_springboot.demo.domain.VerificationToken;
+import org.boot.post_springboot.demo.repository.UserRepository;
 import org.boot.post_springboot.demo.repository.VerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
@@ -22,6 +23,7 @@ public class EmailService {
 
     private static final String senderEmail = "seungrokjeong@bnosoft.co.kr";
     private final VerificationTokenRepository verificationTokenRepository;
+    private final UserRepository userRepository;
 
     // 랜덤으로 숫자 생성
     public String createNumber() {
@@ -86,6 +88,7 @@ public class EmailService {
 
         return token;
     }
+
 
 
 }
