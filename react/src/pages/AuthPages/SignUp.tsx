@@ -2,16 +2,8 @@ import React, {useState, ChangeEvent, FormEvent} from 'react';
 import api from '../../api/api'
 import {PATH} from '../../constants/paths'
 import {useNavigate} from "react-router-dom";
+import {FormData} from '../../@types/formTypes'
 
-interface FormData {
-	userName: string;
-	nickName: string;
-	userEmail: string;
-	password: string;
-	confirmPassword: string;
-	role: string;
-	verificationCode: string;
-}
 
 function SignUpPage() {
 	const [formData, setFormData] = useState<FormData>({
@@ -74,11 +66,11 @@ function SignUpPage() {
 		}
 	};
 
-	const verifyEmailToken = async (token: string) => {
+	const verifyEmailToken = async (authCode: string) => {
 		try {
 			const response = await api.post('/verifyToken', {
 				email: formData.userEmail,
-				token: token
+				authCode: authCode
 			});
 			if (response.status === 200) {
 				setEmailVerified(true);

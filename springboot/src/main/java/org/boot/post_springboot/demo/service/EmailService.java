@@ -4,11 +4,8 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.boot.post_springboot.demo.domain.VerificationToken;
-import org.boot.post_springboot.demo.repository.UserRepository;
 import org.boot.post_springboot.demo.repository.VerificationTokenRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +20,6 @@ public class EmailService {
 
     private static final String senderEmail = "seungrokjeong@bnosoft.co.kr";
     private final VerificationTokenRepository verificationTokenRepository;
-    private final UserRepository userRepository;
 
     // 랜덤으로 숫자 생성
     public String createNumber() {
@@ -76,17 +72,15 @@ public class EmailService {
 
     // 인증 코드 저장
     public String createVerificationToken(String email, String authCode) {
-        String token = UUID.randomUUID().toString();
         LocalDateTime expiryDate = LocalDateTime.now().plusHours(1); // 1시간 후 만료
 
         VerificationToken verificationToken = new VerificationToken();
         verificationToken.setEmail(email);
-        verificationToken.setToken(token);
         verificationToken.setAuthCode(authCode);  // authCode 저장
         verificationToken.setExpiryDate(expiryDate);
         verificationTokenRepository.save(verificationToken);
 
-        return token;
+        return authCode;
     }
 
 
