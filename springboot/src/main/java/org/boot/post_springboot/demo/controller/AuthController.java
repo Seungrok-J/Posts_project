@@ -9,17 +9,23 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-public class UserController {
+public class AuthController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+
+    public AuthController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping("/isExist/{nickName}")
     public ResponseEntity<Boolean> checkNickName(@PathVariable String nickName) {
         return ResponseEntity.ok(userService.checkNickname(nickName));
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
     }
 
     @PostMapping("/register")
@@ -35,6 +41,9 @@ public class UserController {
         UserDTO responseDTO = new UserDTO(savedUser);
         return ResponseEntity.ok(responseDTO);
     }
+
+
+
 
 
 }

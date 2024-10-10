@@ -24,4 +24,5 @@ public class UserDTO {
         this.password = user.getPassword();
         this.role = user.getRole(); // Assuming roles are handled safely elsewhere
     }
+
 }
