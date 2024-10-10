@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.boot.post_springboot.demo.domain.VerificationToken;
+import org.boot.post_springboot.demo.repository.UserRepository;
 import org.boot.post_springboot.demo.repository.VerificationTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
@@ -22,6 +23,7 @@ public class EmailService {
 
     private static final String senderEmail = "seungrokjeong@bnosoft.co.kr";
     private final VerificationTokenRepository verificationTokenRepository;
+    private final UserRepository userRepository;
 
     // 랜덤으로 숫자 생성
     public String createNumber() {
@@ -58,9 +60,9 @@ public class EmailService {
 
     // 메일 발송
     public String sendSimpleMessage(String sendEmail) throws MessagingException {
-        String number = createNumber(); // 랜덤 인증번호 생성
+        String authCode  = createNumber(); // 랜덤 인증번호 생성
 
-        MimeMessage message = createMail(sendEmail, number); // 메일 생성
+        MimeMessage message = createMail(sendEmail, authCode ); // 메일 생성
         try {
             javaMailSender.send(message); // 메일 발송
         } catch (MailException e) {
@@ -68,22 +70,25 @@ public class EmailService {
             throw new IllegalArgumentException("메일 발송 중 오류가 발생했습니다.");
         }
 
-        return number; // 생성된 인증번호 반환
+        return authCode ; // 생성된 인증번호 반환
     }
 
+
     // 인증 코드 저장
-    public String createVerificationToken(String email) {
+    public String createVerificationToken(String email, String authCode) {
         String token = UUID.randomUUID().toString();
         LocalDateTime expiryDate = LocalDateTime.now().plusHours(1); // 1시간 후 만료
 
         VerificationToken verificationToken = new VerificationToken();
         verificationToken.setEmail(email);
         verificationToken.setToken(token);
+        verificationToken.setAuthCode(authCode);  // authCode 저장
         verificationToken.setExpiryDate(expiryDate);
         verificationTokenRepository.save(verificationToken);
 
         return token;
     }
+
 
 
 }

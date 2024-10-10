@@ -3,7 +3,7 @@ import AppHeader from '../../components/Header';
 import AppFooter from '../../components/Footer';
 import {Layout} from 'antd';
 
-const {Header, Content, Footer} = Layout;
+const {Content} = Layout;
 
 interface Props {
 	children: ReactNode;
