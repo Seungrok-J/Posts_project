@@ -18,8 +18,6 @@ public class VerificationToken {
 
     private String email;
 
-    private String token;
-
     private String authCode;
 
     private LocalDateTime expiryDate;
@@ -29,13 +27,11 @@ public class VerificationToken {
     }
 
     // 파라미터를 받는 생성자
-    public VerificationToken(Long id, String email, String token, String authCode, LocalDateTime expiryDate) {
+    public VerificationToken(Long id, String email, String authCode, LocalDateTime expiryDate) {
         this.id = id;
         this.email = email;
-        this.token = token;
         this.authCode = authCode;
         this.expiryDate = expiryDate;
-
     }
 
 }

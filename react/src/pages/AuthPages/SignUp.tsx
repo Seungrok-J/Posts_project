@@ -2,18 +2,9 @@ import React, {useState, ChangeEvent, FormEvent} from 'react';
 import api from '../../api/api'
 import {PATH} from '../../constants/paths'
 import {useNavigate} from "react-router-dom";
+import {FormData} from '../../@types/formTypes'
 
-interface FormData {
-	userName: string;
-	nickName: string;
-	userEmail: string;
-	password: string;
-	confirmPassword: string;
-	role: string;
-	verificationCode: string;
-}
-
-function SignUpPage() {
+const SignUpPage: React.FC = () =>  {
 	const [formData, setFormData] = useState<FormData>({
 		userName: '',
 		nickName: '',
@@ -26,7 +17,7 @@ function SignUpPage() {
 
 	const [emailVerified, setEmailVerified] = useState(false);  // 이메일 인증 상태
 	const [nicknameAvailable, setNicknameAvailable] = useState(false);  // 닉네임 사용 가능 상태
-	const [message, setMessage] = useState('');
+	const [message, setMessage] = useState<string>('');
 	const navigate = useNavigate();
 
 	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -53,11 +44,13 @@ function SignUpPage() {
 		}
 
 		try {
-			const response = await api.post('/users/register', formData);
-			setMessage('Registration successful!');
-			setTimeout(() => {
-				navigate(PATH.LOGIN);
-			},1000);
+			const response = await api.post('/auth/register', formData);
+			if (response.status === 200) {
+				setMessage('Registration successful!');
+				setTimeout(() => {
+					navigate(PATH.LOGIN);
+				}, 1000);
+			}
 		} catch (error) {
 			setMessage('Failed to register');
 		}
@@ -68,17 +61,25 @@ function SignUpPage() {
 			const response = await api.post('/emailCheck', {
 				email: formData.userEmail
 			});
-			setMessage('A verification code has been sent to your email.');
-		} catch (error) {
-			setMessage('Failed to send verification code.');
+			if (response.status === 200) {
+				setMessage('A verification code has been sent to your email.');
+			}
+		} catch (error: any ) {
+			if (error.response) {
+				if(error.response.status === 400) {
+					setMessage(error.response.data || 'Email already in use')
+				}
+			} else {
+				setMessage('Failed to send verification code. {}');
+			}
 		}
 	};
 
-	const verifyEmailToken = async (token: string) => {
+	const verifyEmailToken = async (authCode: string) => {
 		try {
 			const response = await api.post('/verifyToken', {
 				email: formData.userEmail,
-				token: token
+				authCode: authCode
 			});
 			if (response.status === 200) {
 				setEmailVerified(true);
@@ -93,7 +94,7 @@ function SignUpPage() {
 
 	const checkNicknameAvailability = async () => {
 			try {
-				const response = await api.get(`/users/isExist/${formData.nickName}`);
+				const response = await api.get(`/auth/isExist/${formData.nickName}`);
 
 				if (response.data) {
 					setNicknameAvailable(false);

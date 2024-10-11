@@ -13,8 +13,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByNickName(String nickName);
 
-    boolean existsByUserEmail(String userEmail);
-
     Optional<User> findByUserName(String username); // 수정된 메서드 이름
     Optional<User> findByUserEmail(String userEmail);
+
 }

@@ -3,6 +3,7 @@ package org.boot.post_springboot.demo.controller;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.domain.VerificationToken;
 import org.boot.post_springboot.demo.dto.MailDTO;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -31,25 +33,26 @@ public class MailController {
     private final VerificationTokenRepository verificationTokenRepository;
 
     @PostMapping("/emailCheck")
-    public ResponseEntity<String> emailCheck(@RequestBody MailDTO mailDTO, User user) throws MessagingException, UnsupportedEncodingException {
-        Optional<User> existingUser = userService.findByUserEmail(user.getUserEmail());
-        if(existingUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
+    public ResponseEntity<String> emailCheck(@RequestBody MailDTO mailDTO) throws MessagingException {
+        Optional<User> existingUser = emailService.findByUserEmail(mailDTO.getEmail());
+        log.info("유저이메일: {}",existingUser.isPresent());
+        if (existingUser.isPresent()) {
+            return ResponseEntity.badRequest().body("Email already in use");
         }
         String authCode = emailService.sendSimpleMessage(mailDTO.getEmail());
-        String token = emailService.createVerificationToken(mailDTO.getEmail(), authCode);  // 토큰 생성 및 저장
+        emailService.createVerificationToken(mailDTO.getEmail(), authCode);
         return ResponseEntity.ok(authCode);
     }
 
     @PostMapping("/verifyToken")
     public ResponseEntity<String> verifyToken(@RequestBody VerificationRequestDTO requestDto) {
-        List<VerificationToken> tokens = verificationTokenRepository.findByEmailOrderByExpiryDateDesc(requestDto.getEmail());
-        if (tokens.isEmpty()) {
+        List<VerificationToken> authCodes = verificationTokenRepository.findByEmailOrderByExpiryDateDesc(requestDto.getEmail());
+        if (authCodes.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No token found");
         }
 
-        VerificationToken latestToken = tokens.get(0); // 가장 최근 토큰
-        if (latestToken.getAuthCode().equals(requestDto.getToken()) &&
+        VerificationToken latestToken = authCodes.get(0); // 가장 최근 토큰
+        if (latestToken.getAuthCode().equals(requestDto.getAuthCode()) &&
                 latestToken.getExpiryDate().isAfter(LocalDateTime.now())) {
             return ResponseEntity.ok("Token verified successfully");
         } else {
