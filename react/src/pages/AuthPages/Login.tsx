@@ -21,7 +21,7 @@ const Login: React.FC = () => {
 			if (response.status === 200) {
 				console.log(response.data)
 				setUser(response.data);
-				toast.success('Login Successful');
+				toast.success('로그인되었습니다.');
 				setTimeout(() => {
 					navigate(PATH.HOME);
 				}, 2000);

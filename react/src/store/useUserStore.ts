@@ -4,9 +4,10 @@ import { persist, createJSONStorage  } from 'zustand/middleware';
 interface User {
 	userId: string;
 	userName: string;
-	userNickName: string;
+	nickName: string;
 	userEmail: string;
 	sessionId: string;
+	role: string;
 }
 
 interface UserState {

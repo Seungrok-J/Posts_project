@@ -4,7 +4,7 @@ import { PATH } from "../../constants/paths";
 import useUserStore from "../../store/useUserStore";
 
 const AppHeader: React.FC = () => {
-	const { isLoggedIn, logout } = useUserStore();
+	const { isLoggedIn, logout, user } = useUserStore();
 	const navigate = useNavigate();
 
 	const handleLogout = () => {
@@ -19,10 +19,10 @@ const AppHeader: React.FC = () => {
 					<li className="mr-6">
 						<Link className="text-white hover:text-gray-300" to={PATH.HOME}>Home</Link>
 					</li>
-					{isLoggedIn ? (
+					{isLoggedIn && user ? (
 						<>
 							<li className="mr-6">
-								<Link className="text-white hover:text-gray-300" to={PATH.PROFILE}>User Profile</Link>
+								<Link className="text-white hover:text-gray-300" to={`/user/${user.userId}`}>User Profile</Link>
 							</li>
 							<li>
 								<button

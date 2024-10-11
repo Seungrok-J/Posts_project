@@ -68,22 +68,22 @@ public class AuthController {
         return ResponseEntity.ok(responseDTO);
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
-        session.invalidate();
-        SecurityContextHolder.clearContext();
-        return ResponseEntity.ok().body("Logout successful");
-    }
-
-    // 세션확인
-    @GetMapping("/user")
-    public ResponseEntity<?> getCurrentUser(HttpSession session) {
-        User user = (User) session.getAttribute("USER");
-        if (user != null) {
-            return ResponseEntity.ok(new UserDTO(user));
-        }
-        return ResponseEntity.status(401).body("Not logged in");
-    }
+//    @PostMapping("/logout")
+//    public ResponseEntity<?> logout(HttpSession session) {
+//        session.invalidate();
+//        SecurityContextHolder.clearContext();
+//        return ResponseEntity.ok().body("Logout successful");
+//    }
+//
+//    // 세션확인
+//    @GetMapping("/user")
+//    public ResponseEntity<?> getCurrentUser(HttpSession session) {
+//        User user = (User) session.getAttribute("USER");
+//        if (user != null) {
+//            return ResponseEntity.ok(new UserDTO(user));
+//        }
+//        return ResponseEntity.status(401).body("Not logged in");
+//    }
 
 
 }
