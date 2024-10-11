@@ -1,16 +1,36 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { motion } from 'framer-motion';
-import { toast, ToastContainer } from 'react-toastify';
+import React, {useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
+import {motion} from 'framer-motion';
+import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {PATH} from '../../constants/paths'
+import api from '../../api/api'
+import useUserStore from "../../store/useUserStore";
 
 const Login: React.FC = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState('');
 	const navigate = useNavigate();
+	const { setUser } = useUserStore();
 
 	const handleLogin = async (e: React.FormEvent) => {
+		e.preventDefault();
+		try {
+			const response = await api.post('/auth/login',{ userEmail: email, password })
+			if (response.status === 200) {
+				console.log(response.data)
+				setUser(response.data);
+				toast.success('Login Successful');
+				setTimeout(() => {
+					navigate(PATH.HOME);
+				}, 2000);
+			}
+		} catch (err) {
+			setError("Login failed. Please check your credentials");
+			toast.error('Login failed')
+		}
+
 	};
 
 	return (
@@ -22,7 +42,7 @@ const Login: React.FC = () => {
 				className="flex items-center justify-center min-h-screen"
 			>
 				<div className="p-10 rounded-xl shadow-2xl max-w-md w-full">
-					<ToastContainer />
+					<ToastContainer/>
 					<motion.h1
 						initial={{y: -20}}
 						animate={{y: 0}}
@@ -79,7 +99,8 @@ const Login: React.FC = () => {
 						</div>
 					</div>
 					<p className="text-center text-sm mt-8 text-gray-600">
-						계정이 없나요? <Link to="/register" className="text-blue-500 hover:underline font-medium">계정 만들기</Link>
+						계정이 없나요? <Link to={PATH.REGISTER} className="text-blue-500 hover:underline font-medium">계정
+						만들기</Link>
 					</p>
 					{error && <p className="text-red-500 text-center mt-4">{error}</p>}
 				</div>

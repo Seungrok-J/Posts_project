@@ -3,13 +3,16 @@ package org.boot.post_springboot.demo.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.domain.VerificationToken;
+import org.boot.post_springboot.demo.repository.UserRepository;
 import org.boot.post_springboot.demo.repository.VerificationTokenRepository;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -20,6 +23,7 @@ public class EmailService {
 
     private static final String senderEmail = "seungrokjeong@bnosoft.co.kr";
     private final VerificationTokenRepository verificationTokenRepository;
+    private final UserRepository userRepository;
 
     // 랜덤으로 숫자 생성
     public String createNumber() {
@@ -83,6 +87,10 @@ public class EmailService {
         return authCode;
     }
 
+    public Optional<User> findByUserEmail(String userEmail) {
+        Optional<User> userOpt = userRepository.findByUserEmail(userEmail);
+        return userOpt;
+    }
 
 
 }
