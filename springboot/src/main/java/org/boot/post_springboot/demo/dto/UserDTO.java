@@ -15,6 +15,7 @@ public class UserDTO {
     private String nickName;
     private String password;
     private String role;
+    private String sessionId;
 
     public UserDTO(User user) {
         this.userId = user.getUserId();
@@ -24,4 +25,5 @@ public class UserDTO {
         this.password = user.getPassword();
         this.role = user.getRole(); // Assuming roles are handled safely elsewhere
     }
+
 }

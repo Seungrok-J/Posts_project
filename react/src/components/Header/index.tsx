@@ -1,13 +1,17 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { PATH } from "../../constants/paths";
+import useUserStore from "../../store/useUserStore";
 
-interface HeaderProps {
-	isLoggedIn: boolean;
-	onLogout: () => void;
-}
+const AppHeader: React.FC = () => {
+	const { isLoggedIn, logout } = useUserStore();
+	const navigate = useNavigate();
 
-const AppHeader: React.FC<HeaderProps> = ({ isLoggedIn, onLogout }) => {
+	const handleLogout = () => {
+		logout();
+		navigate(PATH.HOME);
+	}
+
 	return (
 		<header className="bg-gray-800 text-white p-4">
 			<nav>
@@ -23,7 +27,7 @@ const AppHeader: React.FC<HeaderProps> = ({ isLoggedIn, onLogout }) => {
 							<li>
 								<button
 									className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md"
-									onClick={onLogout}
+									onClick={handleLogout}
 								>
 									Logout
 								</button>
