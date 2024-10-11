@@ -25,7 +25,9 @@ public class WebSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/home", "/public/**", "/api/emailCheck", "/api/verifyToken","/api/users/isExist/**","/api/users/register").permitAll()
+                        .requestMatchers("/", "/home", "/public/**", "/api/emailCheck",
+                                "/api/verifyToken","/api/users/isExist/**","/api/users/register",
+                                "/api/board/**","/api/board/categories/**","/api/categories/**","/api/board/categories").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션을 사용하지 않는 설정

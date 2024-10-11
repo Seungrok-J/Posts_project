@@ -15,7 +15,7 @@ const RegisterPage = lazy(() => import('../pages/AuthPages/SignUp'));
 const ProfilePage = lazy(() => import('../pages/AuthPages/UserDetail'));
 
 // ---> Board Pages
-const BoardPage = lazy(() => import('../pages/BoardPages/Board'))
+const BoardPage = lazy(() => import('../pages/BoardPages/BoardList'))
 const CreatePostPage = lazy(() => import('../pages/BoardPages/BoardCreate'))
 const EditPostPage = lazy(() => import('../pages/BoardPages/BoardUpdate'))
 const PostPage = lazy(() => import('../pages/BoardPages/BoardDetail'))
@@ -23,6 +23,9 @@ const PostPage = lazy(() => import('../pages/BoardPages/BoardDetail'))
 
 // ---> Error Pages
 const NotFoundPage = lazy(() => import('../pages/ErrorPages/404Pages'));
+
+// ---> Search Pages
+const SearchPage = lazy(() => import('../pages/SearchPages/Searsh'));
 
 const helmetContext = {};
 
@@ -45,6 +48,7 @@ export const AppRoutes = () => {
 							<Route path={PATH.BOARD_SAVE} element={<CreatePostPage />} />
 							<Route path={PATH.BOARD_UPDATE} element={<EditPostPage />} />
 							<Route path={PATH.BOARD_DETAIL} element={<PostPage />} />
+							<Route path={PATH.SEARCH} element={<SearchPage />} />
 							<Route path="*" element={<NotFoundPage />} />
 						</Routes>
 					</Suspense>

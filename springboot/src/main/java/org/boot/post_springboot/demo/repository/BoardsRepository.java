@@ -11,7 +11,8 @@ import java.util.List;
 @Repository
 public interface BoardsRepository extends JpaRepository<Boards,Long>{
 
-    List<Boards> findAllByCategory_CateId(Long cateId);
 
     List<Boards> findAllByUser_UserId(Long userId);
+
+    List<Boards> findByCategory_CateId(Long cateId);
 }
