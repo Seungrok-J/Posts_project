@@ -18,7 +18,9 @@ export const MainLayout = (props: Props) => {
 			<Content>
 				{children}
 			</Content>
+
 			<AppFooter/>
 		</Layout>
+
 	);
 };

@@ -55,7 +55,7 @@ public class MailControllerTests {
     @Test
     public void testVerifyToken() throws Exception {
         // 예시: 목 객체 설정
-        when(verificationTokenRepository.findByEmail(anyString())).thenReturn(new VerificationToken(1L, "user@example.com", "123456", LocalDateTime.now().plusMinutes(30)));
+        when(verificationTokenRepository.findByEmail(anyString())).thenReturn(new VerificationToken(1L,"user@example.com", "123456", "YOUR_TYPE", LocalDateTime.now().plusMinutes(30)));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/verifyToken")
                         .contentType(MediaType.APPLICATION_JSON)

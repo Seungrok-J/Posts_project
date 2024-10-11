@@ -19,10 +19,14 @@ const AppHeader: React.FC = () => {
 					<li className="mr-6">
 						<Link className="text-white hover:text-gray-300" to={PATH.HOME}>Home</Link>
 					</li>
+					<li className="mr-6">
+						<Link className="text-white hover:text-gray-300" to={PATH.BOARD}>Board</Link>
+					</li>
 					{isLoggedIn && user ? (
 						<>
 							<li className="mr-6">
-								<Link className="text-white hover:text-gray-300" to={`/user/${user.userId}`}>User Profile</Link>
+								<Link className="text-white hover:text-gray-300" to={`/user/${user.userId}`}>User
+									Profile</Link>
 							</li>
 							<li>
 								<button
