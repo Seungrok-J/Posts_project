@@ -7,6 +7,7 @@ import org.boot.post_springboot.demo.domain.Boards;
 import org.boot.post_springboot.demo.domain.Categories;
 import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.service.BoardsService;
+import org.boot.post_springboot.demo.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,9 @@ public class BoardController {
 
     @Autowired
     private BoardsService boardsService;
+
+    @Autowired
+    private CategoryService categoryService;
 
 //    @Autowired
 
@@ -83,18 +87,18 @@ public class BoardController {
     }
 
     // 게시판 목록보기 기능
+    // 및 카테고리 all의 내용을 의미 -> 카테고리만 불러 오는 것이 아님, 쿼리문이 다름
     @GetMapping("/list")
     public List<Boards> getAllBoards() {
         return boardsService.getAllBoards();
     }
 
-
-//     카테고리 별 글 보기 기능
-
-    @GetMapping("/list/{cateId}")
-    public List<Boards> getBoardsByCateId(@PathVariable("cateId") Long cateId) {
-        return boardsService.findAllByCategory(cateId);
+    // 카테고리 별 글 보기 기능
+    @GetMapping("/categories")
+    public List<Categories> getCategory(Long cateId) {
+        return categoryService.getAllCategories();
     }
+    
 
     // 유저 별 글 보기 기능(마이페이지)
     @GetMapping("/{userId}/boardList")

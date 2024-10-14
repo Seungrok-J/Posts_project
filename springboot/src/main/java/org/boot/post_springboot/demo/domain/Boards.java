@@ -1,4 +1,5 @@
 package org.boot.post_springboot.demo.domain;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -54,5 +55,4 @@ public class Boards {
     @ManyToOne
     @JoinColumn(name = "cate_id")
     private Categories category;
-
 }

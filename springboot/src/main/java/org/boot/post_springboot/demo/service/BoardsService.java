@@ -113,11 +113,9 @@ public class BoardsService {
         boardsRepository.delete(board);
     }
 
-    // 카테고리 별 조회기능
     public List<Boards> findAllByCategory(Long cateId) {
-        return boardsRepository.findAllByCategory_CateId(cateId);
+        return boardsRepository.findByCategory_CateId(cateId); // 이 메서드는 BoardsRepository에서 정의해야 합니다.
     }
-
 //    내가 쓴 글 보기 기능
     public List<Boards> findAllByUser(Long userId) {
         return boardsRepository.findAllByUser_UserId(userId);

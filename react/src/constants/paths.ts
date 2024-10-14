@@ -3,8 +3,9 @@ export const PATH ={
 	LOGIN: '/login',
 	REGISTER: '/signup',
 	PROFILE: '/user/:id',
-	BOARD: '/board',
-	POST: '/post',
-	POST_CRE:'/post/create',
-	POST_EDIT: '/post/:id/edit'
+	BOARD: '/board/list',
+	BOARD_DETAIL: '/board/:id/detail',
+	BOARD_SAVE:'/board/save',
+	BOARD_UPDATE: '/board/:id/update',
+	SEARCH: '/search'
 }
