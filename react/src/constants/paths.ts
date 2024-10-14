@@ -4,8 +4,8 @@ export const PATH ={
 	REGISTER: '/signup',
 	PROFILE: '/user/:id',
 	BOARD: '/board/list',
-	BOARD_DETAIL: '/board/:id/detail',
-	BOARD_SAVE:'/board/save',
-	BOARD_UPDATE: '/board/:id/update',
+	BOARD_DETAIL: '/board/detail/:id',
+	BOARD_SAVE:'/board/create',
+	BOARD_UPDATE: '/board/update/:id',
 	SEARCH: '/search'
 }

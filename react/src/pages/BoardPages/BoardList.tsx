@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Box } from '@mui/material';
-import { Board } from "../../types/Board";
+import {Route, useNavigate} from 'react-router-dom';
+import {Box} from '@mui/material';
+import {Board} from "../../types/Board";
 import SideBar from "../../components/SideBar/SideBar";
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import {DataGrid, GridColDef} from '@mui/x-data-grid';
+import useUserStore from "../../store/useUserStore";
+import {PATH} from "../../constants/paths";
+import useBoardStore from "../../store/useBoardStore";
+
 const columns: GridColDef[] = [
-    { field: 'cateName', headerName: '카테고리', width: 250, editable: false },
-    { field: 'title', headerName: '제목', width: 250, editable: false },
-    { field: 'nickName', headerName: '작성자', width: 200, editable: false },
+    {field: 'cateName', headerName: '카테고리', width: 250, editable: false},
+    {field: 'title', headerName: '제목', width: 250, editable: false},
+    {field: 'nickName', headerName: '작성자', width: 200, editable: false},
     {
         field: 'createdAt',
         headerName: '작성일',
         width: 250,
-        editable: false,
-        type: "dateTime",
-        valueGetter: (params: { value: string | null }) => new Date(params.value || ''),
+        editable: false
     },
 ];
 
@@ -24,6 +26,7 @@ const BoardList: React.FC = () => {
     const [filteredBoardList, setFilteredBoardList] = useState<Board[]>([]); // 필터된 게시물 리스트
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null); // 선택한 카테고리
     const navigate = useNavigate();
+    const {isLoggedIn, user} = useUserStore();
 
     useEffect(() => {
         const fetchBoardList = async () => {
@@ -47,19 +50,27 @@ const BoardList: React.FC = () => {
             setFilteredBoardList(boardList); // 전체 게시물로 초기화
         }
     }, [selectedCategory, boardList]);
-
+    const { setSelectedBoardId } = useBoardStore();
     const goToDetailPage = (boardId: number) => {
-        navigate(`/board/${boardId}/detail`);
+        console.log("Selected Board ID:", boardId); // 디버깅을 위해 로그 추가
+        if (boardId) {
+            setSelectedBoardId(boardId);
+            navigate(`/board/detail/${boardId}`, { state: { boardId } });
+        }
     };
 
     const handleCategorySelect = (cateId: number | null) => {
         setSelectedCategory(cateId); // 선택한 카테고리 ID 업데이트
     };
+    const post = () => {
+        navigate(PATH.BOARD_SAVE);
+    }
+
 
     return (
-        <Box sx={{ display: 'flex', height: '80vh' }}>
-            <Box sx={{ width: '20rem' }}>
-                <SideBar onCategorySelect={handleCategorySelect} />
+        <Box sx={{display: 'flex', height: '80vh'}}>
+            <Box sx={{width: '20rem'}}>
+                <SideBar onCategorySelect={handleCategorySelect}/>
             </Box>
 
             <Box sx={{
@@ -71,13 +82,13 @@ const BoardList: React.FC = () => {
                 textAlign: 'center'
             }}>
                 {filteredBoardList.length > 0 ? (
-                    <Box sx={{ height: 400, width: '90%' }}>
+                    <Box sx={{height: 400, width: '90%'}}>
                         <DataGrid
                             rows={filteredBoardList.map((board) => ({
                                 boardId: board.boardId,
                                 createdAt: board.createdAt,
                                 title: board.title,
-                                nickName: board.user.nickName,
+                                nickName: board.user ? board.user.nickName : '작성자 정보 없음', // null 체크 추가
                                 cateName: board.category.cateName,
                             }))}
                             columns={columns}
@@ -90,8 +101,22 @@ const BoardList: React.FC = () => {
                 ) : (
                     <p>No boards available.</p>
                 )}
+                <Box>
+                    {isLoggedIn && user ? (
+                        <button
+                            className="m-4 py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md"
+                            onClick={post}
+                        >
+                            글 작성하기
+                        </button>
+                    ) : (
+                        <></>
+                    )}
+                </Box>
             </Box>
+
         </Box>
+
     );
 };
 

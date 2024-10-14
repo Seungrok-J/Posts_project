@@ -1,61 +1,41 @@
 import React, { useEffect, useState } from 'react';
-import { Board } from '../../types/Board';
+import {useLocation, useParams} from 'react-router-dom';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import AspectRatio from '@mui/joy/AspectRatio';
-import Button from '@mui/joy/Button';
-import Card from '@mui/joy/Card';
-import CardContent from '@mui/joy/CardContent';
-import CardActions from '@mui/joy/CardActions';
-import Typography from '@mui/joy/Typography';
-import Stack from '@mui/joy/Stack';
-import { format } from 'date-fns'; // 날짜 포맷팅을 위한 라이브러리
+import useBoardStore from "../../store/useBoardStore";
 
 const BoardDetail: React.FC = () => {
-    const [board, setBoard] = useState<Board | null>(null);
-    const { boardId } = useParams();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const boardId = queryParams.get('boardId'); // 쿼리 파라미터에서 boardId 가져오기
+    const { selectedBoardId } = useBoardStore();
+    console.log("Selected Board ID in Detail Page:",selectedBoardId)
 
-    // 게시물 상세 정보 API 호출
+    // Use boardId as needed
+    const [board, setBoard] = useState<any>(null); // 상세 게시글 상태
     useEffect(() => {
-        const getBoard = async () => {
+        const fetchBoardDetail = async () => {
             try {
-                console.log(`Requesting board details for boardId: ${boardId}`);
-                const response = await axios.get(`http://127.0.0.1:8080/api/board/${boardId}/detail`);
-                console.log('API Response:', response.data); // API 응답 확인
-                setBoard(response.data);
+                const response = await axios.get(`http://localhost:8080/api/board/detail/${selectedBoardId}`);
+                setBoard(response.data); // 상세 게시글 설정
             } catch (error) {
-                console.error("Error fetching board:", error);
+                console.error('게시글 상세 정보를 가져오는 데 오류가 발생했습니다:', error);
             }
         };
 
-        // 호출
-        getBoard();
-    }, [boardId]);
+        fetchBoardDetail();
+    }, [boardId]); // boardId 변경 시 재요청
+
+    if (!board) {
+        return <p>Loading...</p>; // 데이터가 로딩 중일 때 표시
+    }
 
     return (
-        <Stack spacing={4} sx={{ alignItems: 'center', padding: 2 }}>
-            <Card variant="outlined" sx={{ width: '100%', maxWidth: 600 }}>
-                <CardContent>
-                    <Typography level="h4" component="h2" sx={{ marginBottom: 1 }}>
-                        {board?.title}
-                    </Typography>
-                    <Typography level="body-md" color={"neutral"}>
-                        {board && format(new Date(board.createdAt), 'dd MMM yyyy')} {/* 게시물 생성일 */}
-                    </Typography>
-                    <AspectRatio ratio="16/9" sx={{ marginTop: 2 }}>
-                        {board?.filePath && <img src={board.filePath} alt="게시물 이미지" style={{ objectFit: 'cover' }} />}
-                    </AspectRatio>
-                    <Typography level="body-md" sx={{ marginTop: 2 }}>
-                        {board?.content} {/* 게시물 내용 */}
-                    </Typography>
-                </CardContent>
-                <CardActions>
-                    <Button variant="outlined" color="primary" size="sm" onClick={() => window.history.back()}>
-                        돌아가기
-                    </Button>
-                </CardActions>
-            </Card>
-        </Stack>
+        <div>
+            <h1>{board.title}</h1>
+            <p>작성자: {board.user ? board.user.nickName : '정보 없음'}</p>
+            <p>작성일: {board.createdAt}</p>
+            <p>{board.content}</p> {/* 게시글 내용 */}
+        </div>
     );
 };
 
