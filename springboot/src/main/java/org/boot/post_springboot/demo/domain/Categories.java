@@ -19,5 +19,6 @@ public class Categories {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cateId;
 
+    @Column(nullable = false, unique = true)
     private String cateName;
 }

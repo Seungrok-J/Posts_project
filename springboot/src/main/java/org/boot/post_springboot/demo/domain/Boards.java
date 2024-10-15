@@ -37,13 +37,15 @@ public class Boards {
     private String filePath;
 
     // 조회수
-    private Long count;
+    @Column(nullable = false, columnDefinition = "bigint default 0")
+    private Long count = 0L;
 
     // 삭제한 시간
     @UpdateTimestamp
     private LocalDateTime deletedAt;
 
     // 글 삭제 여부: 1인 경우 삭제되어 안보이게
+    @Column(nullable = false, columnDefinition = "bigint default 0")
     private Boolean isDeleted;
 
     // User 테이블과 1대 다 관계
