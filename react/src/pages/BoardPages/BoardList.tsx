@@ -5,6 +5,7 @@ import { Box } from '@mui/material';
 import { Board } from "../../types/Board";
 import SideBar from "../../components/SideBar/SideBar";
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+
 const columns: GridColDef[] = [
     { field: 'cateName', headerName: '카테고리', width: 250, editable: false },
     { field: 'title', headerName: '제목', width: 250, editable: false },
