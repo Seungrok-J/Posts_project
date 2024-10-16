@@ -18,7 +18,7 @@ import {
 const BoardCreate = () => {
     const [postFormData, setPostFormData] = useState({
         category: {
-            cateId: 0,  // cateId를 기본값으로 설정
+            cateId: 1,  // cateId를 기본값으로 설정
         },
         title: '',
         content: '',
