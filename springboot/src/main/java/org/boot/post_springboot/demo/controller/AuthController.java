@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.domain.UserRole;
 import org.boot.post_springboot.demo.dto.UserDTO;
-import org.boot.post_springboot.demo.repository.UserRepository;
+import org.boot.post_springboot.demo.response.ErrorResponse;
 import org.boot.post_springboot.demo.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +14,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Optional;
 
 
@@ -27,7 +29,6 @@ public class AuthController {
 
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
-    private  UserRepository userRepository;
 
 
     public AuthController(UserService userService, AuthenticationManager authenticationManager) {
@@ -57,39 +58,57 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDTO loginDto, HttpSession session) {
         try {
-            // 먼저 사용자가 존재하는지 빠르게 확인
-            Optional<User> userOptional = userRepository.findByUserEmail(loginDto.getUserEmail());
-            if (userOptional.isEmpty()) {
-                log.warn("로그인 실패: 존재하지 않는 이메일={}", loginDto.getUserEmail());
+            // 1. 빠른 자격 증명 검사
+            boolean isValid = userService.validateUserCredentials(loginDto.getUserEmail(), loginDto.getPassword());
+            if (!isValid) {
+                log.warn("로그인 실패: 잘못된 자격 증명 - 이메일={}", loginDto.getUserEmail());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body("Login failed: Invalid email or password");
+                        .body(new ErrorResponse("Invalid email or password"));
             }
 
-            // 사용자가 존재하면 인증 진행
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginDto.getUserEmail(), loginDto.getPassword())
-            );
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // 2. 사용자 정보 가져오기
+            Optional<User> userOptional = userService.findByUserEmailOptional(loginDto.getUserEmail());
+            if (userOptional.isEmpty()) {
+                log.warn("사용자 조회 실패: 이메일={}", loginDto.getUserEmail());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("User not found"));
+            }
             User user = userOptional.get();
 
-            // 세션 관리
-            session.setAttribute("USER", user);
-            log.info("로그인 성공: 세션 ID={}", session.getId());
+            // 3. Spring Security 인증 처리
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    user.getUserEmail(),
+                    null, // 이미 검증되었으므로 credentials는 null
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            // 4. 세션 처리
+            session.setAttribute("USER", user);
+            log.info("로그인 성공: 유저={}, 세션ID={}", user.getUserEmail(), session.getId());
+
+            // 5. 응답 생성
             UserDTO responseDTO = new UserDTO(user);
             responseDTO.setSessionId(session.getId());
             return ResponseEntity.ok(responseDTO);
 
-        } catch (AuthenticationException e) {
-            log.error("로그인 실패: 이메일={}, 에러메시지={}", loginDto.getUserEmail(), e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Login failed: Invalid email or password");
+        } catch (Exception e) {
+            log.error("로그인 처리 중 오류 발생: 이메일={}, 에러메시지={}", loginDto.getUserEmail(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Login processing error"));
         }
     }
 
 
-
-
-
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpSession session) {
+        SecurityContextHolder.clearContext();
+        session.invalidate();
+        return ResponseEntity.ok().body("Successfully logged out");
+    }
 }
+
+
+
+
+

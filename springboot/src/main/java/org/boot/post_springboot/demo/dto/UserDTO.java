@@ -27,5 +27,17 @@ public class UserDTO {
         this.role = user.getRole(); // Assuming roles are handled safely elsewhere
     }
 
+    @Override
+    public String toString() {
+        return "UserDTO{" +
+                "userId=" + userId +
+                ", userEmail='" + userEmail + '\'' +
+                ", userName='" + userName + '\'' +
+                ", nickName='" + nickName + '\'' +
+                ", role='" + role + '\'' +
+                ", sessionId='" + sessionId + '\'' +
+                '}';
+    }
+
 
 }

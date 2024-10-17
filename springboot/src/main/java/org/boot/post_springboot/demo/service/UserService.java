@@ -1,5 +1,6 @@
 package org.boot.post_springboot.demo.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,17 +10,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -28,6 +28,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
         User user = userRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userEmail));
@@ -39,29 +40,40 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    public String encodePassword(String password) {
-        return passwordEncoder.encode(password);
+    // 빠른 패스워드 검증을 위한 새로운 메소드
+    @Transactional(readOnly = true)
+    public boolean validateUserCredentials(String email, String password) {
+        Optional<User> userOptional = userRepository.findByUserEmail(email);
+        if (userOptional.isEmpty()) {
+            return false;
+        }
+        User user = userOptional.get();
+        return passwordEncoder.matches(password, user.getPassword());
     }
 
-    public boolean checkNickname(String nickname) {
-        return userRepository.existsByNickName(nickname);
+    @Transactional(readOnly = true)
+    public Optional<User> findByUserEmailOptional(String userEmail) {
+        return userRepository.findByUserEmail(userEmail);
     }
 
+    @Transactional(readOnly = true)
+    public User findByUserEmail(String userEmail) {
+        return findByUserEmailOptional(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userEmail));
+    }
 
-
+    @Transactional
     public User saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
-    public User findByUserEmail(String userEmail) {
-        return userRepository.findByUserEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userEmail));
+    @Transactional(readOnly = true)
+    public boolean checkNickname(String nickname) {
+        return userRepository.existsByNickName(nickname);
     }
 
-    @Cacheable(value = "userCache", key = "#userEmail", unless = "#result == null")
-    public Optional<User> findByUserEmailOptional(String userEmail) {
-        return userRepository.findByUserEmail(userEmail);
+    public String encodePassword(String password) {
+        return passwordEncoder.encode(password);
     }
-
 }
