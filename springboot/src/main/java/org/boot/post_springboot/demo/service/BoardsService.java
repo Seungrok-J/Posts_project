@@ -68,7 +68,7 @@ public class BoardsService {
                 .content(boardDTO.getContent())
                 .category(category)
                 .user(user)
-                .isDeleted(false) // 기본적으로 삭제되지 않은 상태
+                .isDeleted(0L) // 기본적으로 삭제되지 않은 상태
                 .count(0L) // 조회수 초기화
                 .fileName(boardDTO.getFileName())
                 .filePath(boardDTO.getFilePath())

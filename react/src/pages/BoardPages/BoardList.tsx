@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import {Route, useNavigate} from 'react-router-dom';
 import {Box} from '@mui/material';
-import {Board} from "../../types/Board";
+import {Board} from "../../@types/Board";
 import SideBar from "../../components/SideBar/SideBar";
 import {DataGrid, GridColDef} from '@mui/x-data-grid';
 import useUserStore from "../../store/useUserStore";

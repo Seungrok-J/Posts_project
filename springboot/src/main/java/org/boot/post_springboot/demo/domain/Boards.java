@@ -46,7 +46,7 @@ public class Boards {
 
     // 글 삭제 여부: 1인 경우 삭제되어 안보이게
     @Column(nullable = false, columnDefinition = "bigint default 0")
-    private Boolean isDeleted;
+    private Long isDeleted =0L;
 
     // User 테이블과 1대 다 관계
 

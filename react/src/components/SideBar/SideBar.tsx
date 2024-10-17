@@ -2,7 +2,7 @@ import React, { useEffect, useState, CSSProperties } from 'react';
 import axios from 'axios';
 import { Navigation } from 'react-minimal-side-navigation';
 import 'react-minimal-side-navigation/lib/ReactMinimalSideNavigation.css';
-import { Category } from '../../types/Category';
+import { Category } from '../../@types/Category';
 
 interface SideBarProps {
     onCategorySelect: (cateId: number | null) => void; // 선택된 카테고리 ID를 전달하는 함수

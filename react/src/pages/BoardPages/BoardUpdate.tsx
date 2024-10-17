@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Category } from "../../types/Category";
+import { Category } from "../../@types/Category";
 import axios from "axios";
 import { toast } from "react-toastify";
 import useUserStore from "../../store/useUserStore";

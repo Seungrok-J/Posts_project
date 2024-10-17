@@ -3,6 +3,7 @@ package org.boot.post_springboot.demo.service;
 import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -58,6 +59,9 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + userEmail));
     }
 
-
+    @Cacheable(value = "userCache", key = "#userEmail", unless = "#result == null")
+    public Optional<User> findByUserEmailOptional(String userEmail) {
+        return userRepository.findByUserEmail(userEmail);
+    }
 
 }

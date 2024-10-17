@@ -29,7 +29,6 @@ const Login: React.FC = () => {
 					sessionId: response.data.sessionId // 세션 ID
 				});
 				toast.success('Login Successful');
-				console.log(setUser)
 				setTimeout(() => {
 					navigate(PATH.HOME);
 				}, 2000);
@@ -40,25 +39,6 @@ const Login: React.FC = () => {
 		}
 
 	};
-	// const handleLogin = async (e: React.FormEvent) => {
-	// 	e.preventDefault();
-	// 	try {
-	// 		const response = await api.post('/auth/login',{ userEmail: email, password })
-	// 		if (response.status === 200) {
-	// 			console.log(response.data)
-	// 			setUser(response.data);
-	// 			console.log("setUser: ", setUser)
-	// 			toast.success('Login Successful');
-	// 			setTimeout(() => {
-	// 				navigate(PATH.HOME);
-	// 			}, 2000);
-	// 		}
-	// 	} catch (err) {
-	// 		setError("Login failed. Please check your credentials");
-	// 		toast.error('Login failed')
-	// 	}
-	//
-	// };
 
 	return (
 		<>
