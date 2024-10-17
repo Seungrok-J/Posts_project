@@ -7,15 +7,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Repository
-public interface BoardsRepository extends JpaRepository<Boards,Long>{
+public interface BoardsRepository extends JpaRepository<Boards, UUID>{
 
 
-    List<Boards> findAllByUser_UserId(Long userId);
+    List<Boards> findAllByUser_UserId(UUID userId);
 
-    Categories findByCategory_CateId(Long categoryId);
+    Categories findByCategory_CateId(UUID categoryId);
 
     List<Boards> findByIsDeletedFalse(); // 삭제되지 않은 게시물만 조회
 

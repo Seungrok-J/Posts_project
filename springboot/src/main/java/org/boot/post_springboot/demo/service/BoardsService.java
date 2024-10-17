@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -39,7 +40,7 @@ public class BoardsService {
     }
 
     // 특정 게시물 조회(검색기능)
-    public Boards getBoardById(Long boardId) {
+    public Boards getBoardById(UUID boardId) {
         // 게시물 찾기
         Boards board = boardsRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
@@ -78,7 +79,7 @@ public class BoardsService {
     }
 
     // 게시물 수정 기능
-    public Boards updateBoard(Long boardId, BoardDTO boardDTO, String username) {
+    public Boards updateBoard(UUID boardId, BoardDTO boardDTO, String username) {
         Boards board = boardsRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
 
@@ -96,7 +97,7 @@ public class BoardsService {
         return boardsRepository.save(board); // 변경된 게시글 저장
     }
 
-    public void deleteBoard(Long boardId, @AuthenticationPrincipal User user) {
+    public void deleteBoard(UUID boardId, @AuthenticationPrincipal User user) {
         // 게시글 조회
         Boards board = boardsRepository.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
@@ -112,13 +113,13 @@ public class BoardsService {
         logger.info("게시물이 성공적으로 삭제되었습니다. 게시물 ID: " + boardId);
     }
 
-    public Categories findAllByCategory(Long cateId) {
+    public Categories findAllByCategory(UUID cateId) {
 
         return boardsRepository.findByCategory_CateId(cateId); // 이 메서드는 BoardsRepository에서 정의해야 합니다.
     }
 
     //    내가 쓴 글 보기 기능
-    public List<Boards> findAllByUser(Long userId) {
+    public List<Boards> findAllByUser(UUID userId) {
         return boardsRepository.findAllByUser_UserId(userId);
     }
 

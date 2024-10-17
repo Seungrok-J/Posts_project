@@ -7,14 +7,16 @@ import org.springframework.stereotype.Repository;
 import org.boot.post_springboot.demo.domain.User;
 
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, UUID> {
     boolean existsByNickName(String nickName);
 
-    Optional<User> findByUserName(String username); // 수정된 메서드 이름
+    //    Optional<User> findByUserName(String username); // 수정된 메서드 이름
     Optional<User> findByUserEmail(String userEmail);
 
-    User findByUserId(Long userId);
+    User findByUserId(UUID userId);
+    Optional<User> findByUserName(String userName);
 }

@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class CommentsService {
@@ -28,7 +29,7 @@ public class CommentsService {
     // ex) 유저가 로그인을 했다면 or 글을 작성한 유저라면
 
     // 댓글 작성 기능
-    public Comments saveComment(Long boardId, Comments comment) {
+    public Comments saveComment(UUID boardId, Comments comment) {
         Boards board = boardsRepository.findById(boardId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         comment.setBoards(board);
