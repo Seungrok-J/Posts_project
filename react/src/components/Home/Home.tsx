@@ -5,7 +5,7 @@ import useUserStore from '../../store/useUserStore'
 
 const HomePage: React.FC = () => {
 	const {user, isLoggedIn} = useUserStore();
-	console.log(user)
+	console.log("user",user)
 
 	return (
 		<div className="bg-gray-900 min-h-screen flex items-center justify-center text-white">
@@ -14,7 +14,7 @@ const HomePage: React.FC = () => {
 					<h1 className="text-4xl font-bold mb-4">React Typescript Template</h1>
 					{isLoggedIn && user ? (
 						<>
-							<p>Nick Name : {user.nickName} </p>
+							<p>Nick Name : {user.nickName}</p>
 							<p className="text-gray-300">
 								User Name: <span className="ml-2">{user.userName}</span>
 							</p>
