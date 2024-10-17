@@ -4,7 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 interface User {
     userId: string; // 식별자로 사용
     userName: string;
-    userNickName: string;
+    nickName: string;
     userEmail: string;
     sessionId: string;
 }
