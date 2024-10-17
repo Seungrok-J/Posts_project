@@ -1,7 +1,8 @@
 package org.boot.post_springboot.demo.config;
 
-import org.boot.post_springboot.demo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import org.boot.post_springboot.demo.security.CustomUserDetailsService;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -21,22 +22,22 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
+//
+    private final CustomUserDetailsService userDetailsService;
 
-    private final UserService userService;
-
-    public WebSecurityConfig(@Lazy UserService userService) {
-        this.userService = userService;
+    public WebSecurityConfig(@Lazy CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+//
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(userService)
+                .userDetailsService(userDetailsService) // CustomUserDetailsService 주입
                 .passwordEncoder(passwordEncoder)
                 .and()
                 .build();
@@ -45,10 +46,11 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf().disable() // CSRF 보호 비활성화
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/home", "/public/**", "/api/emailCheck", "/api/verifyToken", "/api/auth/**").permitAll()
+                        .requestMatchers("/", "/home", "/public/**", "/api/emailCheck", "/api/verifyToken", "/api/auth/**", "/api/board/**").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(login -> login.disable())
                 .httpBasic(basic -> basic.disable());
@@ -59,9 +61,9 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:3000/**"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "*"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -69,4 +71,6 @@ public class WebSecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+    
+
 }

@@ -1,8 +1,10 @@
+import * as timers from "node:timers";
+
 export interface Board {
     isDeleted: boolean;
     boardId: number;
     count: number;
-    createdAt: string;
+    createdAt: string
     deletedAt: string | null;
     updatedAt: string | null;
     content: string;
@@ -17,3 +19,13 @@ export interface Board {
         nickName: string;
     }
 }
+
+// export interface Board {
+//     title: string;
+//     content: string;
+//     category: {
+//         cateId: number;
+//     };
+//     fileName?: string;
+//     filePath?: string;
+// }

@@ -16,6 +16,7 @@ public class UserDTO {
     private String password;
     private String role;
     private String sessionId;
+//    private String token; // JWT 토큰을 위한 필드 추가 (은지 수정)
 
     public UserDTO(User user) {
         this.userId = user.getUserId();
