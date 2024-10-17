@@ -17,7 +17,6 @@ import java.util.UUID;
 @Setter
 @Table(name="users")
 public class User {
-
     @Id
     @UuidGenerator
     @GeneratedValue

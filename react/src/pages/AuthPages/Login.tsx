@@ -18,12 +18,13 @@ const Login: React.FC = () => {
 		e.preventDefault();
 		try {
 			const response = await api.post('/auth/login',{ userEmail: email, password })
+			console.log("로그인 요청 보내기")
 			if (response.status === 200) {
 				console.log(response.data)
 				setUser({
 					userId: response.data.userId,  // 사용자 ID
 					userName: response.data.userName, // 사용자 이름
-					userNickName: response.data.userNickName, // 사용자 닉네임
+					nickName: response.data.nickName, // 사용자 닉네임
 					userEmail: response.data.userEmail, // 사용자 이메일
 					role:response.data.role,
 					sessionId: response.data.sessionId // 세션 ID

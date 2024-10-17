@@ -75,7 +75,7 @@ const BoardCreate = () => {
         formData.append('title', postFormData.title);
         formData.append('content', postFormData.content);
         formData.append('categoryId', postFormData.category.cateId.toString());
-        formData.append('nickname', user?.userNickName || '');
+        formData.append('nickname', user?.nickName || '');
         formData.append('name', user?.userName || '');
 
         if (selectedFile) {
@@ -102,7 +102,7 @@ const BoardCreate = () => {
             <Typography variant="h6" gutterBottom>
                 사용자 정보
             </Typography>
-            <Typography>닉네임: {user?.userNickName}</Typography>
+            <Typography>닉네임: {user?.nickName}</Typography>
             <Typography>이름: {user?.userName}</Typography>
 
             <form onSubmit={handleSubmit}>
