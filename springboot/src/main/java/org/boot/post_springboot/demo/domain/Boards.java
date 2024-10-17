@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Builder
 @Entity
@@ -16,8 +18,9 @@ import java.time.LocalDateTime;
 @Table(name = "Boards")
 public class Boards {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long boardId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidGenerator
+    private UUID boardId;
 
     @Column(nullable = false)
     private String title;

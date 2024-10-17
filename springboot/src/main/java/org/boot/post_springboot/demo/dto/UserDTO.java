@@ -3,13 +3,15 @@ package org.boot.post_springboot.demo.dto;
 import lombok.*;
 import org.boot.post_springboot.demo.domain.User;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class UserDTO {
-    private Long userId;
+    private UUID userId;
     private String userEmail;
     private String userName;
     private String nickName;

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CategoryService {
@@ -29,11 +30,11 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
     // 카테고리 별 조회 기능
-    public Optional<Categories> getCategoryById(Long cateId) {
+    public Optional<Categories> getCategoryById(UUID cateId) {
         return categoryRepository.findById(cateId);
     }
     // 카테고리 삭제 기능
-    public void deleteCategoryById(Long cateId) {
+    public void deleteCategoryById(UUID cateId) {
         categoryRepository.deleteById(cateId);
     }
     // 카테고리 수정 기능
@@ -41,7 +42,7 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
-    public Categories findByCateId(Long cateId) {
+    public Categories findByCateId(UUID cateId) {
         return categoryRepository.findById(cateId).get();
     }
 
