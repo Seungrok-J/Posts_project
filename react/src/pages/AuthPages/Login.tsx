@@ -23,7 +23,7 @@ const Login: React.FC = () => {
 				setUser({
 					userId: response.data.userId,  // 사용자 ID
 					userName: response.data.userName, // 사용자 이름
-					userNickName: response.data.userNickName, // 사용자 닉네임
+					nickName: response.data.nickName, // 사용자 닉네임
 					userEmail: response.data.userEmail, // 사용자 이메일
 					sessionId: response.data.sessionId // 세션 ID
 				});
