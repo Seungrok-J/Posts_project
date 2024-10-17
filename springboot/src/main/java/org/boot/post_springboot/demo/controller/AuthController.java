@@ -7,10 +7,12 @@ import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.domain.UserRole;
 import org.boot.post_springboot.demo.dto.UserDTO;
 import org.boot.post_springboot.demo.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,23 +52,37 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDTO loginDto, HttpSession session) {
-        log.info("로그인 시도 : {}", loginDto.getUserEmail());
-        log.info("비밀번호 : {}", loginDto.getPassword());
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getUserEmail(), loginDto.getPassword())
-        );
+        try {
+            log.info("로그인 시도: 이메일={}", loginDto.getUserEmail());
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        User user = userService.findByUserEmail(loginDto.getUserEmail());
-        session.setAttribute("USER", user);
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDto.getUserEmail(), loginDto.getPassword())
+            );
 
-        log.info("로그인 성공. 세션 ID: {}", session.getId());
-        log.info("세션에 저장된 사용자 정보: {}", user);
-        UserDTO responseDTO = new UserDTO(user);
-        responseDTO.setSessionId(session.getId());
-        log.info("DTO: {}", responseDTO);
-        return ResponseEntity.ok(responseDTO);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            User user = userService.findByUserEmail(loginDto.getUserEmail());
+
+            if (user == null) {
+                log.error("사용자 정보를 찾을 수 없음: 이메일={}", loginDto.getUserEmail());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 정보를 찾을 수 없습니다.");
+            }
+
+            session.setAttribute("USER", user);
+            log.info("로그인 성공: 세션 ID={}, 사용자 ID={}", session.getId(), user.getUserId());
+
+            UserDTO responseDTO = new UserDTO(user);
+            responseDTO.setSessionId(session.getId());
+
+            return ResponseEntity.ok(responseDTO);
+        } catch (AuthenticationException e) {
+            log.error("로그인 실패: 이메일={}, 에러={}", loginDto.getUserEmail(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 정보가 정확하지 않습니다.");
+        } catch (Exception e) {
+            log.error("서버 에러: 이메일={}, 에러={}", loginDto.getUserEmail(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 에러가 발생했습니다.");
+        }
     }
+
 
 //    @PostMapping("/logout")
 //    public ResponseEntity<?> logout(HttpSession session) {
