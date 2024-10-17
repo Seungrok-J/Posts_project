@@ -4,6 +4,7 @@ import org.boot.post_springboot.demo.domain.Boards;
 import org.boot.post_springboot.demo.domain.Categories;
 import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.dto.BoardDTO;
+import org.boot.post_springboot.demo.dto.CategoryDTO;
 import org.boot.post_springboot.demo.repository.BoardsRepository;
 import org.boot.post_springboot.demo.repository.CategoryRepository;
 import org.boot.post_springboot.demo.repository.UserRepository;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,18 +53,20 @@ public class BoardsService {
         return board;
     }
 
-//
+    //
     // 게시물 저장 기능
-    public Boards saveBoard(BoardDTO boardDTO) {
+    public Boards saveBoard(BoardDTO boardDTO,
+                            @AuthenticationPrincipal User user, Categories category) {
         // 현재 로그인된 사용자 정보 가져오기
-        User user = userRepository.findByUserId(boardDTO.getUserId());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        user = userRepository.findByUserId(user.getUserId());
+        category = categoryRepository.findByCateId(category.getCateId());
 
         // 게시글 객체 생성
         Boards board = Boards.builder()
                 .title(boardDTO.getTitle())
                 .content(boardDTO.getContent())
-                .category(categoryRepository.findById(boardDTO.getCategoryId())
-                        .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다.")))
+                .category(category)
                 .user(user)
                 .isDeleted(false) // 기본적으로 삭제되지 않은 상태
                 .count(0L) // 조회수 초기화
@@ -86,23 +90,26 @@ public class BoardsService {
         // 게시물 내용 업데이트
         board.setTitle(boardDTO.getTitle());
         board.setContent(boardDTO.getContent());
-        board.setCategory(categoryRepository.findById(boardDTO.getCategoryId())
+        board.setCategory(categoryRepository.findById(boardDTO.getCateId())
                 .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다.")));
 
         return boardsRepository.save(board); // 변경된 게시글 저장
     }
 
-    // 게시물 삭제 기능
-    public void deleteBoard(Long boardId, String username) {
+    public void deleteBoard(Long boardId, @AuthenticationPrincipal User user) {
+        // 게시글 조회
         Boards board = boardsRepository.findById(boardId)
-                .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
 
-        // 작성자와 로그인된 사용자 비교
-        if (!board.getUser().getUserName().equals(username)) {
-            throw new SecurityException("작성자만 게시물을 삭제할 수 있습니다.");
+        // 현재 로그인한 사용자의 ID와 게시글 작성자의 ID 비교
+        if (!board.getUser().getUserId().equals(user.getUserId())) {
+            logger.error("게시물 삭제 실패: 권한이 없는 사용자입니다.");
+            throw new SecurityException("삭제 권한이 없습니다."); // 권한이 없을 경우 예외 발생
         }
 
-        boardsRepository.delete(board); // 게시물 삭제
+        // 게시글 삭제
+        boardsRepository.delete(board);
+        logger.info("게시물이 성공적으로 삭제되었습니다. 게시물 ID: " + boardId);
     }
 
     public Categories findAllByCategory(Long cateId) {
@@ -116,81 +123,3 @@ public class BoardsService {
     }
 
 }
-// 게시물 작성 기능 (인증된 사용자만 작성 가능)
-//    public Boards saveBoard(Boards board) {
-//        logger.info("게시물 작성 요청: {}", board);
-//
-//        // 인증된 사용자 정보 가져오기
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            logger.error("게시물 작성 실패: 인증되지 않은 사용자입니다.");
-//            throw new SecurityException("인증된 사용자만 게시물을 작성할 수 있습니다.");
-//        }
-//
-//        // 현재 로그인된 사용자 정보
-//        String userid = authentication.getName();
-//        logger.info("현재 로그인된 사용자: {}", userid);
-//        User user = userRepository.findByUserName(userid);
-//
-//        if (user == null) {
-//            logger.error("게시물 작성 실패: 사용자 정보를 찾을 수 없습니다.");
-//            throw new SecurityException("사용자 정보를 찾을 수 없습니다.");
-//        }
-//
-//        // 작성자를 게시물에 설정
-//        board.setUser(user);
-//        logger.info("게시물 작성자 설정: {}", user.getUserName());
-//
-//        // 게시물 저장
-//        Boards savedBoard = boardsRepository.save(board);
-//        logger.info("게시물 작성 완료: {}", savedBoard.getBoardId());
-//        return savedBoard;
-//    }
-//
-//    // 게시물 수정 기능 (작성자만 수정 가능)
-//    public Boards updateBoard(Long boardId, Boards updatedBoard) {
-//        // 인증된 사용자 정보 가져오기
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            throw new SecurityException("인증된 사용자만 게시물을 수정할 수 있습니다.");
-//        }
-//
-//        // 게시물과 작성자 정보 가져오기
-//        Boards board = boardsRepository.findById(boardId)
-//                .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
-//        String username = authentication.getName();
-//
-//        // 게시물 작성자와 로그인한 사용자 비교
-//        if (!board.getUser().getUserName().equals(username)) {
-//            throw new SecurityException("작성자만 게시물을 수정할 수 있습니다.");
-//        }
-//
-//        // 게시물 내용 업데이트
-//        board.setTitle(updatedBoard.getTitle());
-//        board.setContent(updatedBoard.getContent());
-//        board.setCategory(updatedBoard.getCategory());
-//
-//        return boardsRepository.save(board);
-//    }
-//
-//    // 게시물 삭제 기능 (작성자만 삭제 가능)
-//    public void deleteBoard(Long boardId) {
-//        // 인증된 사용자 정보 가져오기
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            throw new SecurityException("인증된 사용자만 게시물을 삭제할 수 있습니다.");
-//        }
-//
-//        // 게시물과 작성자 정보 가져오기
-//        Boards board = boardsRepository.findById(boardId)
-//                .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
-//        String username = authentication.getName();
-//
-//        // 작성자가 동일한지 확인
-//        if (!board.getUser().getUserName().equals(username)) {
-//            throw new SecurityException("작성자만 게시물을 삭제할 수 있습니다.");
-//        }
-//
-//        // 게시물 삭제
-//        boardsRepository.delete(board);
-//    }
