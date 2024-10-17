@@ -18,4 +18,5 @@ public interface BoardsRepository extends JpaRepository<Boards,Long>{
     Categories findByCategory_CateId(Long categoryId);
 
     List<Boards> findByIsDeletedFalse(); // 삭제되지 않은 게시물만 조회
+
 }
