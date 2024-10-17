@@ -61,7 +61,7 @@ public class BoardsService {
         // 현재 로그인된 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         user = userRepository.findByUserId(user.getUserId());
-        category = categoryRepository.findByCateId(category.getCateId());
+        category = categoryRepository.findByCateName(category.getCateName());
 
         // 게시글 객체 생성
         Boards board = Boards.builder()
@@ -91,8 +91,7 @@ public class BoardsService {
         // 게시물 내용 업데이트
         board.setTitle(boardDTO.getTitle());
         board.setContent(boardDTO.getContent());
-        board.setCategory(categoryRepository.findById(boardDTO.getCateId())
-                .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다.")));
+        board.setCategory(categoryRepository.findByCateName(boardDTO.getCateName()));
 
         return boardsRepository.save(board); // 변경된 게시글 저장
     }

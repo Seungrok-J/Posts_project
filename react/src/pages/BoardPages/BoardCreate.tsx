@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 const BoardCreate = () => {
     const [postFormData, setPostFormData] = useState({
         category: {
-            cateId: 1,  // 기본 카테고리 ID
+            cateName:"일상",  // 기본 카테고리 ID
         },
         title: '',
         content: '',
@@ -40,7 +40,7 @@ const BoardCreate = () => {
                 if (response.data.length > 0) {
                     setPostFormData(prev => ({
                         ...prev,
-                        category: { cateId: response.data[0].cateId }
+                        category: { cateName: response.data[0].cateName }
                     }));
                 }
             } catch (error) {
@@ -65,7 +65,7 @@ const BoardCreate = () => {
         }
 
         // 카테고리 선택 확인
-        if (!postFormData.category.cateId) {
+        if (!postFormData.category.cateName) {
             toast.error("카테고리를 선택해주세요.");
             return;
         }
@@ -74,7 +74,7 @@ const BoardCreate = () => {
         formData.append('userId', user?.userId.toString() || '');
         formData.append('title', postFormData.title);
         formData.append('content', postFormData.content);
-        formData.append('categoryId', postFormData.category.cateId.toString());
+        formData.append('categoryName', postFormData.category.cateName);
         formData.append('nickname', user?.nickName || '');
         formData.append('name', user?.userName || '');
 
@@ -111,17 +111,17 @@ const BoardCreate = () => {
                     <Select
                         sx={{ marginTop: 2 }}
                         labelId="cate-select-label"
-                        value={postFormData.category.cateId}  // 현재 선택된 카테고리 값 설정
+                        value={postFormData.category.cateName}  // 현재 선택된 카테고리 값 설정
                         onChange={(e) => setPostFormData(prev => ({
                             ...prev,
-                            category: { cateId: Number(e.target.value) } // Number로 타입 변환
+                            category: { cateName: (e.target.value) } // Number로 타입 변환
                         }))}
                     >
                         <MenuItem value="default" disabled>
                             선택하세요.
                         </MenuItem>
                         {categories.map((item) => (
-                            <MenuItem key={item.cateId} value={item.cateId}>
+                            <MenuItem key={item.cateName} value={item.cateName}>
                                 {item.cateName}
                             </MenuItem>
                         ))}

@@ -24,7 +24,7 @@ const columns: GridColDef[] = [
 const BoardList: React.FC = () => {
     const [boardList, setBoardList] = useState<Board[]>([]);
     const [filteredBoardList, setFilteredBoardList] = useState<Board[]>([]); // 필터된 게시물 리스트
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null); // 선택한 카테고리
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // 선택한 카테고리
     const navigate = useNavigate();
     const {isLoggedIn, user} = useUserStore();
 
@@ -51,7 +51,7 @@ const BoardList: React.FC = () => {
         }
     }, [selectedCategory, boardList]);
     const { setSelectedBoardId } = useBoardStore();
-    const goToDetailPage = (boardId: number) => {
+    const goToDetailPage = (boardId: string) => {
         console.log("Selected Board ID:", boardId); // 디버깅을 위해 로그 추가
         if (boardId) {
             setSelectedBoardId(boardId);
@@ -59,7 +59,7 @@ const BoardList: React.FC = () => {
         }
     };
 
-    const handleCategorySelect = (cateId: number | null) => {
+    const handleCategorySelect = (cateId: string | null) => {
         setSelectedCategory(cateId); // 선택한 카테고리 ID 업데이트
     };
     const post = () => {

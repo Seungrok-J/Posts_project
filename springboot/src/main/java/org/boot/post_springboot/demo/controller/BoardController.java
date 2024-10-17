@@ -82,7 +82,7 @@ public class BoardController {
             @RequestParam("userId") UUID userId,
             @RequestParam("title") String title,
             @RequestParam("content") String content,
-            @RequestParam("categoryId") UUID categoryId,
+            @RequestParam("categoryName") String categoryName,
             @RequestParam(value = "file", required = false) MultipartFile file
     ) {
         // 게시글 DTO 생성
@@ -90,7 +90,7 @@ public class BoardController {
                 .title(title)
                 .content(content)
                 .userId(userId) // 작성자 정보 설정
-                .cateId(categoryId) // 카테고리 ID 설정
+                .cateName(categoryName) // 카테고리 ID 설정
                 .build();
 
         // 업로드 디렉토리 생성
@@ -117,7 +117,7 @@ public class BoardController {
         Boards savedBoard = boardsService.saveBoard(
                 boardDTO,
                 userRepository.findByUserId(userId),
-                categoryRepository.findByCateId(categoryId)
+                categoryRepository.findByCateName(categoryName)
         ); // 게시글 저장
 
         log.debug("Board saved successfully: {}", savedBoard);
@@ -140,3 +140,4 @@ public class BoardController {
         response.sendRedirect("/list"); // 리디렉션할 경로로 수정하세요
     }
 }
+
