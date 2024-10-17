@@ -20,7 +20,14 @@ const Login: React.FC = () => {
 			const response = await api.post('/auth/login',{ userEmail: email, password })
 			if (response.status === 200) {
 				console.log(response.data)
-				setUser(response.data);
+				setUser({
+					userId: response.data.userId,  // 사용자 ID
+					userName: response.data.userName, // 사용자 이름
+					nickName: response.data.nickName, // 사용자 닉네임
+					userEmail: response.data.userEmail, // 사용자 이메일
+					role:response.data.role,
+					sessionId: response.data.sessionId // 세션 ID
+				});
 				toast.success('Login Successful');
 				setTimeout(() => {
 					navigate(PATH.HOME);

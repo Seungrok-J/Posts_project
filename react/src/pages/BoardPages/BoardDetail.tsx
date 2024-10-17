@@ -1,61 +1,94 @@
-import React, { useEffect, useState } from 'react';
-import { Board } from '../../types/Board';
+import React, {useEffect, useState} from 'react';
+import {useLocation, useParams, useNavigate} from 'react-router-dom';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import AspectRatio from '@mui/joy/AspectRatio';
-import Button from '@mui/joy/Button';
-import Card from '@mui/joy/Card';
-import CardContent from '@mui/joy/CardContent';
-import CardActions from '@mui/joy/CardActions';
-import Typography from '@mui/joy/Typography';
-import Stack from '@mui/joy/Stack';
-import { format } from 'date-fns'; // 날짜 포맷팅을 위한 라이브러리
+import useUserStore from "../../store/useUserStore";
+import useBoardStore from "../../store/useBoardStore";
+import {
+    Container,
+    Typography,
+    Button,
+    Box,
+} from '@mui/material';
 
 const BoardDetail: React.FC = () => {
-    const [board, setBoard] = useState<Board | null>(null);
-    const { boardId } = useParams();
+    const {selectedBoardId} = useBoardStore();
+    const {isLoggedIn, user} = useUserStore();
+    const navigate = useNavigate();
+    const {id: boardId} = useParams();
 
-    // 게시물 상세 정보 API 호출
+    const [board, setBoard] = useState<any>(null); // 상세 게시글 상태
+    const dir_url ='C:/Users/bnosoft/1007/Posts_project/src/img';
     useEffect(() => {
-        const getBoard = async () => {
-            try {
-                console.log(`Requesting board details for boardId: ${boardId}`);
-                const response = await axios.get(`http://127.0.0.1:8080/api/board/${boardId}/detail`);
-                console.log('API Response:', response.data); // API 응답 확인
-                setBoard(response.data);
-            } catch (error) {
-                console.error("Error fetching board:", error);
+        const fetchBoardDetail = async (id: string | undefined) => {
+            if (id) {
+                try {
+                    const response = await axios.get(`http://localhost:8080/api/board/detail/${boardId}`);
+                    setBoard(response.data); // 상세 게시글 설정
+                } catch (error) {
+                    console.error('게시글 상세 정보를 가져오는 데 오류가 발생했습니다:', error);
+                }
             }
         };
 
-        // 호출
-        getBoard();
-    }, [boardId]);
+        fetchBoardDetail(boardId); // boardId 또는 selectedBoardId로 게시글 상세 정보 요청
+    }, [selectedBoardId]);
+
+    if (!board) {
+        return <p>Loading...</p>; // 데이터가 로딩 중일 때 표시
+    }
+
+    const handleEdit = () => {
+        navigate(`/board/update/${boardId}`); // 수정 페이지로 이동
+    };
+
+    const handleDelete = async () => {
+        if (window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+            try {
+                await axios.delete(`http://localhost:8080/api/board/delete/${boardId}`);
+                alert('게시글이 삭제되었습니다.');
+                navigate('/board/list'); // 게시글 목록으로 이동
+            } catch (error) {
+                console.error('게시글 삭제 중 오류 발생:', error);
+                alert('게시글 삭제에 실패했습니다.');
+            }
+        }
+    };
 
     return (
-        <Stack spacing={4} sx={{ alignItems: 'center', padding: 2 }}>
-            <Card variant="outlined" sx={{ width: '100%', maxWidth: 600 }}>
-                <CardContent>
-                    <Typography level="h4" component="h2" sx={{ marginBottom: 1 }}>
-                        {board?.title}
-                    </Typography>
-                    <Typography level="body-md" color={"neutral"}>
-                        {board && format(new Date(board.createdAt), 'dd MMM yyyy')} {/* 게시물 생성일 */}
-                    </Typography>
-                    <AspectRatio ratio="16/9" sx={{ marginTop: 2 }}>
-                        {board?.filePath && <img src={board.filePath} alt="게시물 이미지" style={{ objectFit: 'cover' }} />}
-                    </AspectRatio>
-                    <Typography level="body-md" sx={{ marginTop: 2 }}>
-                        {board?.content} {/* 게시물 내용 */}
-                    </Typography>
-                </CardContent>
-                <CardActions>
-                    <Button variant="outlined" color="primary" size="sm" onClick={() => window.history.back()}>
-                        돌아가기
+        <Container maxWidth="md" sx={{mt: 4}}>
+            <Typography variant="subtitle2" color="textSecondary">
+                카테고리: {board.category.cateName} {/* 날짜 형식 설정 */}
+            </Typography>
+            <Typography variant="h4" component="h1" gutterBottom>
+                {board.title}
+            </Typography>
+            <Typography variant="subtitle1">
+                작성자: {board.user ? board.user.nickName : '정보 없음'}
+            </Typography>
+            <Typography variant="subtitle2" color="textSecondary">
+                작성일: {new Date(board.createdAt).toLocaleDateString()} {/* 날짜 형식 설정 */}
+            </Typography>
+
+            <div>
+                <img src={`${dir_url}/${board.fileName}`} alt={board.title}/>
+            </div>
+
+            <Typography variant="body1" sx={{mt: 2}}>
+
+                {board.content} {/* 게시글 내용 */}
+            </Typography>
+
+            {isLoggedIn && board.user && user && board.user.userId === user.userId && ( // 수정 및 삭제 버튼 조건
+                <Box sx={{mt: 2}}>
+                    <Button variant="contained" onClick={handleEdit} sx={{mr: 2}}>
+                        수정
                     </Button>
-                </CardActions>
-            </Card>
-        </Stack>
+                    <Button variant="contained" onClick={handleDelete}>
+                        삭제
+                    </Button>
+                </Box>
+            )}
+        </Container>
     );
 };
 

@@ -6,13 +6,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.domain.UserRole;
 import org.boot.post_springboot.demo.dto.UserDTO;
+import org.boot.post_springboot.demo.repository.UserRepository;
 import org.boot.post_springboot.demo.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 
 @Slf4j
@@ -22,6 +27,7 @@ public class AuthController {
 
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private  UserRepository userRepository;
 
 
     public AuthController(UserService userService, AuthenticationManager authenticationManager) {
@@ -50,40 +56,40 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDTO loginDto, HttpSession session) {
-        log.info("로그인 시도 : {}", loginDto.getUserEmail());
-        log.info("비밀번호 : {}", loginDto.getPassword());
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getUserEmail(), loginDto.getPassword())
-        );
+        try {
+            // 먼저 사용자가 존재하는지 빠르게 확인
+            Optional<User> userOptional = userRepository.findByUserEmail(loginDto.getUserEmail());
+            if (userOptional.isEmpty()) {
+                log.warn("로그인 실패: 존재하지 않는 이메일={}", loginDto.getUserEmail());
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Login failed: Invalid email or password");
+            }
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        User user = userService.findByUserEmail(loginDto.getUserEmail());
-        session.setAttribute("USER", user);
+            // 사용자가 존재하면 인증 진행
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDto.getUserEmail(), loginDto.getPassword())
+            );
 
-        log.info("로그인 성공. 세션 ID: {}", session.getId());
-        log.info("세션에 저장된 사용자 정보: {}", user);
-        UserDTO responseDTO = new UserDTO(user);
-        responseDTO.setSessionId(session.getId());
-        log.info("DTO: {}", responseDTO);
-        return ResponseEntity.ok(responseDTO);
-    }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            User user = userOptional.get();
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
-        session.invalidate();
-        SecurityContextHolder.clearContext();
-        return ResponseEntity.ok().body("Logout successful");
-    }
+            // 세션 관리
+            session.setAttribute("USER", user);
+            log.info("로그인 성공: 세션 ID={}", session.getId());
 
-    // 세션확인
-    @GetMapping("/user")
-    public ResponseEntity<?> getCurrentUser(HttpSession session) {
-        User user = (User) session.getAttribute("USER");
-        if (user != null) {
-            return ResponseEntity.ok(new UserDTO(user));
+            UserDTO responseDTO = new UserDTO(user);
+            responseDTO.setSessionId(session.getId());
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (AuthenticationException e) {
+            log.error("로그인 실패: 이메일={}, 에러메시지={}", loginDto.getUserEmail(), e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Login failed: Invalid email or password");
         }
-        return ResponseEntity.status(401).body("Not logged in");
     }
+
+
+
 
 
 }
