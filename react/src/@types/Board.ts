@@ -1,31 +1,12 @@
-import * as timers from "node:timers";
+import {Category} from "./Category";
+import {User} from "./User";
 
 export interface Board {
-    isDeleted: boolean;
-    boardId: number;
-    count: number;
-    createdAt: string
-    deletedAt: string | null;
-    updatedAt: string | null;
-    content: string;
-    fileName: string | null;
-    filePath: string | null;
+    boardId: string;
     title: string;
-    category: {
-        cateId: number;
-        cateName: string;
-    };
-    user:{
-        nickName: string;
-    }
+    content: string;
+    category: Category;
+    user: User;
+    updatedAt: string;
+    fileName?: string;
 }
-
-// export interface Board {
-//     title: string;
-//     content: string;
-//     category: {
-//         cateId: number;
-//     };
-//     fileName?: string;
-//     filePath?: string;
-// }

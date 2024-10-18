@@ -5,7 +5,7 @@ import 'react-minimal-side-navigation/lib/ReactMinimalSideNavigation.css';
 import { Category } from '../../@types/Category';
 
 interface SideBarProps {
-    onCategorySelect: (cateId: number | null) => void; // 선택된 카테고리 ID를 전달하는 함수
+    onCategorySelect: (cateId: string | null) => void; // 선택된 카테고리 ID를 전달하는 함수
 }
 
 const SideBar: React.FC<SideBarProps> = ({ onCategorySelect }) => {
@@ -27,7 +27,7 @@ const SideBar: React.FC<SideBarProps> = ({ onCategorySelect }) => {
 
     const handleCategorySelect = (itemId: string) => {
         setActiveItemId(itemId);
-        onCategorySelect(itemId === '/all' ? null : parseInt(itemId)); // 선택한 카테고리 ID를 부모에게 전달
+        onCategorySelect(itemId === '/all' ? null : (itemId)); // 선택한 카테고리 ID를 부모에게 전달
     };
 
     const barStyle: CSSProperties = {
@@ -51,7 +51,7 @@ const SideBar: React.FC<SideBarProps> = ({ onCategorySelect }) => {
                             },
                             ...categories.map((category) => ({
                                 title: category.cateName,
-                                itemId: category.cateId.toString(),
+                                itemId: category.cateId,
                             })),
                         ],
                     },

@@ -8,6 +8,7 @@ import {DataGrid, GridColDef} from '@mui/x-data-grid';
 import useUserStore from "../../store/useUserStore";
 import {PATH} from "../../constants/paths";
 import useBoardStore from "../../store/useBoardStore";
+import {format} from "date-fns";
 
 const columns: GridColDef[] = [
     {field: 'cateName', headerName: '카테고리', width: 250, editable: false},
@@ -24,7 +25,7 @@ const columns: GridColDef[] = [
 const BoardList: React.FC = () => {
     const [boardList, setBoardList] = useState<Board[]>([]);
     const [filteredBoardList, setFilteredBoardList] = useState<Board[]>([]); // 필터된 게시물 리스트
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null); // 선택한 카테고리
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // 선택한 카테고리
     const navigate = useNavigate();
     const {isLoggedIn, user} = useUserStore();
 
@@ -51,7 +52,7 @@ const BoardList: React.FC = () => {
         }
     }, [selectedCategory, boardList]);
     const { setSelectedBoardId } = useBoardStore();
-    const goToDetailPage = (boardId: number) => {
+    const goToDetailPage = (boardId: string) => {
         console.log("Selected Board ID:", boardId); // 디버깅을 위해 로그 추가
         if (boardId) {
             setSelectedBoardId(boardId);
@@ -59,7 +60,7 @@ const BoardList: React.FC = () => {
         }
     };
 
-    const handleCategorySelect = (cateId: number | null) => {
+    const handleCategorySelect = (cateId: string | null) => {
         setSelectedCategory(cateId); // 선택한 카테고리 ID 업데이트
     };
     const post = () => {
@@ -83,12 +84,13 @@ const BoardList: React.FC = () => {
             }}>
                 {filteredBoardList.length > 0 ? (
                     <Box sx={{height: 400, width: '90%'}}>
+
                         <DataGrid
                             rows={filteredBoardList.map((board) => ({
                                 boardId: board.boardId,
-                                createdAt: board.createdAt,
+                                createdAt: board.updatedAt ? format(new Date(board.updatedAt), 'yyyy-MM-dd HH:mm:ss') : '날짜 정보 없음', // 날짜 포맷팅 추가
                                 title: board.title,
-                                nickName: board.user ? board.user.nickName : '작성자 정보 없음', // null 체크 추가
+                                nickName: board.user ? board.user.nickName : '작성자 정보 없음',
                                 cateName: board.category.cateName,
                             }))}
                             columns={columns}

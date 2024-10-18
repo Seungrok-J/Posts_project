@@ -1,13 +1,13 @@
 import {create} from 'zustand';
 
 interface BoardStore {
-    selectedBoardId: number | null;
-    setSelectedBoardId: (id: number) => void;
+    selectedBoardId: string | null;
+    setSelectedBoardId: (id: string) => void;
 }
 
 const useBoardStore =  create<BoardStore>((set) => ({
     selectedBoardId: null,
-    setSelectedBoardId: (id:number) => set({selectedBoardId: id}),
+    setSelectedBoardId: (id:string) => set({selectedBoardId: id}),
 
 }));
 export default useBoardStore;
