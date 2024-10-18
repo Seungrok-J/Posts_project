@@ -42,9 +42,6 @@ public class User {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(nullable = true)
-    private String sessionId;
-
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
