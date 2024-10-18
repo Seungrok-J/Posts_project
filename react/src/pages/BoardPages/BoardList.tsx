@@ -8,6 +8,7 @@ import {DataGrid, GridColDef} from '@mui/x-data-grid';
 import useUserStore from "../../store/useUserStore";
 import {PATH} from "../../constants/paths";
 import useBoardStore from "../../store/useBoardStore";
+import {format} from "date-fns";
 
 const columns: GridColDef[] = [
     {field: 'cateName', headerName: '카테고리', width: 250, editable: false},
@@ -83,12 +84,13 @@ const BoardList: React.FC = () => {
             }}>
                 {filteredBoardList.length > 0 ? (
                     <Box sx={{height: 400, width: '90%'}}>
+
                         <DataGrid
                             rows={filteredBoardList.map((board) => ({
                                 boardId: board.boardId,
-                                createdAt: board.createdAt,
+                                createdAt: board.updatedAt ? format(new Date(board.updatedAt), 'yyyy-MM-dd HH:mm:ss') : '날짜 정보 없음', // 날짜 포맷팅 추가
                                 title: board.title,
-                                nickName: board.user ? board.user.nickName : '작성자 정보 없음', // null 체크 추가
+                                nickName: board.user ? board.user.nickName : '작성자 정보 없음',
                                 cateName: board.category.cateName,
                             }))}
                             columns={columns}

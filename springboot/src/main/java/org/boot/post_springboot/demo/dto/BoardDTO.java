@@ -17,6 +17,7 @@ public class BoardDTO {
     private String fileName; // 파일 이름
     private String filePath; // 파일 경로
     private UUID userId; // 작성자 정보
+    private Long isDeleted; // 삭제 상태
 //    private UUID cateId; // 카테고리 ID (카테고리 정보)
     private String cateName; // 카테고리 이름 (카테고리 이름)
 

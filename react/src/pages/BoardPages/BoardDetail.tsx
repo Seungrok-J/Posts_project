@@ -17,7 +17,7 @@ const BoardDetail: React.FC = () => {
     const {id: boardId} = useParams();
 
     const [board, setBoard] = useState<any>(null); // 상세 게시글 상태
-    const dir_url ='C:/Users/bnosoft/1007/Posts_project/src/img';
+    const dir_url = 'C:/Users/bnosoft/1007/Posts_project/src/img';
     useEffect(() => {
         const fetchBoardDetail = async (id: string | undefined) => {
             if (id) {
@@ -49,7 +49,7 @@ const BoardDetail: React.FC = () => {
                 navigate('/board/list'); // 게시글 목록으로 이동
             } catch (error) {
                 console.error('게시글 삭제 중 오류 발생:', error);
-                alert('게시글 삭제에 실패했습니다.');
+                alert('게시글 삭제에 실패했습니다.')
             }
         }
     };
@@ -66,7 +66,7 @@ const BoardDetail: React.FC = () => {
                 작성자: {board.user ? board.user.nickName : '정보 없음'}
             </Typography>
             <Typography variant="subtitle2" color="textSecondary">
-                작성일: {new Date(board.createdAt).toLocaleDateString()} {/* 날짜 형식 설정 */}
+                작성일: {new Date(board.updatedAt).toLocaleString()} {/* 날짜 형식 설정 */}
             </Typography>
 
             <div>

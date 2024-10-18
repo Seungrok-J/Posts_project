@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import useUserStore from "../../store/useUserStore";
 import {
     Container,
+    Typography,
     TextField,
     Select,
     MenuItem,
@@ -13,51 +14,57 @@ import {
     FormControl,
     Box,
 } from '@mui/material';
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const BoardUpdate = () => {
-    const { boardId } = useParams<{ boardId: string }>();
+    const { id } = useParams<{ id: string }>();
     const [postFormData, setPostFormData] = useState({
         category: {
-            cateId: 1,
+            cateName: "",
         },
         title: '',
         content: '',
     });
+
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const { isLoggedIn } = useUserStore();
+    const { isLoggedIn, user } = useUserStore();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const response = await axios.get('http://127.0.0.1:8080/api/board/categories');
                 setCategories(response.data);
-            } catch (error) {
-                console.error("카테고리 목록을 가져오는 데 오류가 발생했습니다.", error);
-            }
-        };
-        fetchCategories();
-    }, []);
-
-    useEffect(() => {
-        const fetchBoardDetail = async () => {
-            if (boardId) {
-                try {
-                    const response = await axios.get(`http://127.0.0.1:8080/api/board/detail/${boardId}`);
-                    const { title, content, category } = response.data;
-                    setPostFormData({
-                        title,
-                        content,
-                        category: { cateId: category.cateId },
-                    });
-                } catch (error) {
-                    console.error("게시글 상세 정보를 가져오는 데 오류가 발생했습니다.", error);
+                // 기본적으로 첫 번째 카테고리로 설정
+                if (response.data.length > 0) {
+                    setPostFormData(prev => ({
+                        ...prev,
+                        category: { cateName: response.data[0].cateName }
+                    }));
                 }
+            } catch (error) {
+                console.log("카테고리 목록을 가져오는 데 오류가 발생했습니다.", error);
             }
         };
-        fetchBoardDetail();
-    }, [boardId]);
+
+        const fetchPostDetails = async () => {
+            try {
+                const response = await axios.get(`http://127.0.0.1:8080/api/board/detail/${id}`);
+                setPostFormData({
+                    category: { cateName: response.data.category.cateName },
+                    title: response.data.title,
+                    content: response.data.content,
+                });
+            } catch (error) {
+                console.log("게시글 정보를 가져오는 데 오류가 발생했습니다.", error);
+                toast.error("게시글 정보를 가져오는 데 오류가 발생했습니다.");
+            }
+        };
+
+        fetchCategories();
+        fetchPostDetails();
+    }, [id]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
@@ -74,46 +81,54 @@ const BoardUpdate = () => {
         }
 
         const formData = new FormData();
+        formData.append('userId', user?.userId.toString() || '');
         formData.append('title', postFormData.title);
         formData.append('content', postFormData.content);
-        formData.append('categoryId', postFormData.category.cateId.toString());
+        formData.append('categoryName', postFormData.category.cateName);
 
         if (selectedFile) {
             formData.append('file', selectedFile);
         }
 
         try {
-            const response = await axios.put(`http://127.0.0.1:8080/api/board/update/${boardId}`, formData, {
+            await axios.put(`http://127.0.0.1:8080/api/board/update/${id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
 
-            const updatedBoardId = response.data;
-            window.location.href = `/board/detail/${updatedBoardId}`;
+            toast.success("게시글이 업데이트되었습니다.");
+            navigate(`/board/detail/${id}`);
         } catch (error) {
-            console.error("게시글 수정 중 오류 발생", error);
+            console.log("게시글 업데이트 중 오류 발생", error);
+            toast.error("게시글 업데이트에 실패했습니다.");
         }
     };
 
     return (
         <Container maxWidth="sm" sx={{ mt: 4 }}>
+            <Typography variant="h6" gutterBottom>
+                사용자 정보
+            </Typography>
+            <Typography>닉네임: {user?.nickName}</Typography>
+            <Typography>이름: {user?.userName}</Typography>
+
             <form onSubmit={handleSubmit}>
                 <FormControl fullWidth margin="normal">
                     <InputLabel id="cate-select-label">카테고리</InputLabel>
                     <Select
-                        sx={{ marginTop: 2 }}
                         labelId="cate-select-label"
-                        value={postFormData.category.cateId.toString()}
+                        value={postFormData.category.cateName}
                         onChange={(e) => setPostFormData(prev => ({
                             ...prev,
-                            category: { cateId: parseInt(e.target.value) }
-                        }))}>
+                            category: { cateName: e.target.value }
+                        }))}
+                    >
                         <MenuItem value="default" disabled>
                             선택하세요.
                         </MenuItem>
                         {categories.map((item) => (
-                            <MenuItem key={item.cateId} value={item.cateId}>
+                            <MenuItem key={item.cateName} value={item.cateName}>
                                 {item.cateName}
                             </MenuItem>
                         ))}
@@ -151,7 +166,8 @@ const BoardUpdate = () => {
                     <Button
                         variant="outlined"
                         component="label"
-                        sx={{ marginTop: 2 }}>
+                        sx={{ marginTop: 2 }}
+                    >
                         파일 업로드
                         <input type="file" hidden onChange={handleFileChange} />
                     </Button>
@@ -168,7 +184,7 @@ const BoardUpdate = () => {
                         variant="contained"
                         type="submit"
                     >
-                        등록
+                        수정
                     </Button>
                 </Box>
             </form>
