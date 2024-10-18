@@ -2,6 +2,7 @@ package org.boot.post_springboot.demo.domain;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -21,6 +22,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Builder
@@ -32,8 +34,9 @@ import lombok.Setter;
 public class Comments {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long commentsId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidGenerator
+    private UUID commentsId;
 
     @ManyToOne
     @JoinColumn(name = "board_id", nullable = false)

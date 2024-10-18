@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CategoryService {
@@ -18,7 +19,7 @@ public class CategoryService {
     // 레파지토리는 쿼리만 작성 자세한 요구사항
     // ex) 유저가 로그인을 했다면 or 글을 작성한 유저라면
     // 이 부분은 관리자가 추가되면 진행 일단은 임의의 카테고리 db에서 추가하여 진행
-    
+
     // 카테고리 추가 기능
     public Categories saveCategory(Categories category) {
         return categoryRepository.save(category);
@@ -29,11 +30,11 @@ public class CategoryService {
         return categoryRepository.findAll();
     }
     // 카테고리 별 조회 기능
-    public Optional<Categories> getCategoryById(Long cateId) {
+    public Optional<Categories> getCategoryById(UUID cateId) {
         return categoryRepository.findById(cateId);
     }
     // 카테고리 삭제 기능
-    public void deleteCategoryById(Long cateId) {
+    public void deleteCategoryById(UUID cateId) {
         categoryRepository.deleteById(cateId);
     }
     // 카테고리 수정 기능
@@ -41,7 +42,7 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
-    public Categories findByCateId(Long cateId) {
+    public Categories findByCateId(UUID cateId) {
         return categoryRepository.findById(cateId).get();
     }
 

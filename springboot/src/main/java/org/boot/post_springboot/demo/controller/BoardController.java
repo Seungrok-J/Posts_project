@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 
 @Slf4j
@@ -58,7 +59,7 @@ public class BoardController {
 
     // 유저 별 글 보기 기능(마이페이지)
     @GetMapping("/{userId}/boardList")
-    public List<Boards> getBoardsByUserId(@PathVariable("userId") Long userId) {
+    public List<Boards> getBoardsByUserId(@PathVariable("userId") UUID userId) {
         return boardsService.findAllByUser(userId);
     }
 
@@ -68,7 +69,7 @@ public class BoardController {
     }
 
     @GetMapping("/detail/{boardId}")
-    public ResponseEntity<Boards> getBoardById(@PathVariable Long boardId) {
+    public ResponseEntity<Boards> getBoardById(@PathVariable UUID boardId) {
         return ResponseEntity.ok(boardsService.getBoardById(boardId));
     }
 
@@ -78,10 +79,10 @@ public class BoardController {
 
     @PostMapping("/save")
     public ResponseEntity<Boards> saveBoard(
-            @RequestParam("userId") Long userId,
+            @RequestParam("userId") UUID userId,
             @RequestParam("title") String title,
             @RequestParam("content") String content,
-            @RequestParam("categoryId") Long categoryId,
+            @RequestParam("categoryId") UUID categoryId,
             @RequestParam(value = "file", required = false) MultipartFile file
     ) {
         // 게시글 DTO 생성
@@ -124,7 +125,7 @@ public class BoardController {
     }
 
     @PutMapping("/{boardId}")
-    public ResponseEntity<Boards> updateBoard(@PathVariable Long boardId, @RequestBody BoardDTO boardDTO) {
+    public ResponseEntity<Boards> updateBoard(@PathVariable UUID boardId, @RequestBody BoardDTO boardDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName(); // 로그인한 유저의 username을 가져옴
 
@@ -134,9 +135,8 @@ public class BoardController {
     }
 
     @DeleteMapping("/board/{boardId}")
-    public void deleteBoard(@PathVariable Long boardId, @AuthenticationPrincipal User user, HttpServletResponse response) throws IOException {
+    public void deleteBoard(@PathVariable UUID boardId, @AuthenticationPrincipal User user, HttpServletResponse response) throws IOException {
         boardsService.deleteBoard(boardId, user);
         response.sendRedirect("/list"); // 리디렉션할 경로로 수정하세요
     }
 }
-
