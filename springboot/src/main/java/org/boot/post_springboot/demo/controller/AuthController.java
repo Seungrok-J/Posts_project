@@ -7,7 +7,10 @@ import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.domain.UserRole;
 import org.boot.post_springboot.demo.dto.UserDTO;
 import org.boot.post_springboot.demo.response.ErrorResponse;
+import org.boot.post_springboot.demo.security.RSAKeyGenerator;
+import org.boot.post_springboot.demo.service.AuthService;
 import org.boot.post_springboot.demo.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +21,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.PublicKey;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -30,10 +35,22 @@ public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
 
+    @Autowired
+    private RSAKeyGenerator rsaKeyGenerator;
+    @Autowired
+    private AuthService authService;
 
     public AuthController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+    }
+
+    // 공개키를 제공하는 엔드포인트
+    @GetMapping("/public-key")
+    public ResponseEntity<String> getPublicKey() {
+        PublicKey publicKey = rsaKeyGenerator.getPublicKey();
+        String encodedKey = Base64.getEncoder().encodeToString(publicKey.getEncoded());
+        return ResponseEntity.ok(encodedKey);
     }
 
     @GetMapping("/isExist/{nickName}")
@@ -58,8 +75,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserDTO loginDto, HttpSession session) {
         try {
+            // 비밀번호 복호화
+            String decryptedPassword = authService.decryptPassword(loginDto.getPassword());
+
+            // 복호화된 비밀번호로 인증 진행
             // 1. 빠른 자격 증명 검사
-            boolean isValid = userService.validateUserCredentials(loginDto.getUserEmail(), loginDto.getPassword());
+            boolean isValid = userService.validateUserCredentials(loginDto.getUserEmail(),decryptedPassword);
             if (!isValid) {
                 log.warn("로그인 실패: 잘못된 자격 증명 - 이메일={}", loginDto.getUserEmail());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

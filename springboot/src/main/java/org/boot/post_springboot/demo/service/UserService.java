@@ -73,7 +73,7 @@ public class UserService implements UserDetailsService {
         return userRepository.existsByNickName(nickname);
     }
 
-    public String encodePassword(String password) {
-        return passwordEncoder.encode(password);
-    }
+//    public String encodePassword(String password) {
+//        return passwordEncoder.encode(password);
+//    }
 }

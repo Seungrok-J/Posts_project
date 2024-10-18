@@ -22,7 +22,6 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
-//
     private final CustomUserDetailsService userDetailsService;
 
     public WebSecurityConfig(@Lazy CustomUserDetailsService userDetailsService) {
