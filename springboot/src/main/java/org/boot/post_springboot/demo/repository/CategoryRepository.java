@@ -13,6 +13,4 @@ import java.util.UUID;
 @Repository
 public interface CategoryRepository extends JpaRepository<Categories, UUID> {
     Categories findByCateName(String CateName);
-
-//    Categories findByCateName(String cateName);
 }
