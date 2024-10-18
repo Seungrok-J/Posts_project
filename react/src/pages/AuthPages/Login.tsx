@@ -1,40 +1,94 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {motion} from 'framer-motion';
 import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {PATH} from '../../constants/paths'
-import api from '../../api/api'
+import {PATH} from '../../constants/paths';
+import api from '../../api/api';
 import useUserStore from "../../store/useUserStore";
+import {JSEncrypt} from 'jsencrypt';
 
 const Login: React.FC = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState('');
+	const [publicKey, setPublicKey] = useState('');
 	const navigate = useNavigate();
-	const { setUser } = useUserStore();
+	const {setUser} = useUserStore();
 
-	const handleLogin = async (e: React.FormEvent) => {
+
+	useEffect(() => {
+		fetchPublicKey();
+	}, []);
+
+	const fetchPublicKey = async () => {
+		try {
+			const response = await api.get('auth/public-key');
+			setPublicKey(response.data);
+			console.log("public Key: ", response.data)
+		} catch (error) {
+			console.error("Failed to fetch public key: ", error);
+			setError("Failedto fetch public key, Please try again");
+		}
+	}
+
+	const encryptPassword = (password: string) => {
+		try {
+			if (!publicKey) {
+				throw new Error("Public key is not available or invalid.");
+			}
+
+			const encrypt = new JSEncrypt();
+			encrypt.setPublicKey(publicKey);
+			const encrypted = encrypt.encrypt(password);
+
+			if (!encrypted) {
+				throw new Error("Encryption failed");
+			}
+
+			console.log("Encrypted password:", encrypted); // 디버깅용
+			return encrypted;
+		} catch (error) {
+			console.error("Encryption error:", error);
+			throw error;
+		}
+	};
+
+
+	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		try {
-			const response = await api.post('/auth/login',{ userEmail: email, password })
+			const encryptedPassword = encryptPassword(password);
+			if (!encryptedPassword) {
+				throw new Error("Failed to encrypt password");
+			}
+
+			const response = await api.post('/auth/login', {userEmail: email, password: encryptedPassword}, {
+				headers: {'Content-Type': "application/json"}
+			});
+
 			if (response.status === 200) {
-				console.log(response.data)
+				console.log(response.data);
 				setUser({
-					userId: response.data.userId,  // 사용자 ID
-					userName: response.data.userName, // 사용자 이름
-					nickName: response.data.nickName, // 사용자 닉네임
-					userEmail: response.data.userEmail, // 사용자 이메일
-					role:response.data.role,
-					sessionId: response.data.sessionId // 세션 ID
+					userId: response.data.userId,
+					userName: response.data.userName,
+					nickName: response.data.nickName,
+					userEmail: response.data.userEmail,
+					role: response.data.role,
+					sessionId: response.data.sessionId
 				});
 				toast.success('Login Successful');
 				setTimeout(() => {
 					navigate(PATH.HOME);
 				}, 2000);
 			}
-		} catch (err) {
-			setError("Login failed. Please check your credentials");
+		} catch (err: unknown) {
+			console.error("Login error:", err);
+			if (err instanceof Error) {
+				setError(`Login failed: ${err.message}`);
+			} else {
+				setError("Login failed: An unexpected error occurred");
+			}
 		}
 	};
 
