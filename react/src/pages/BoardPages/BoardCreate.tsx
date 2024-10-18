@@ -1,47 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { Category } from "../../@types/Category";
-import axios from "axios";
-import { toast } from "react-toastify";
+import React, {useState, useEffect} from 'react';
+import axios from 'axios';
+import {toast} from 'react-toastify';
+import {useNavigate} from 'react-router-dom';
+import {PostFormData} from "../../@types/PostFormData";
 import useUserStore from "../../store/useUserStore";
-import {
-    Container,
-    Typography,
-    TextField,
-    Select,
-    MenuItem,
-    Button,
-    InputLabel,
-    FormControl,
-    Box,
-} from '@mui/material';
-import { useNavigate } from "react-router-dom";
+import {Category} from "../../@types/Category";
+import PostForm from "../../components/BoardDetail/PostForm";
+import {Container} from "@mui/material";
+import UserInfo from "../../components/BoardDetail/UserInfo";
 
-const BoardCreate = () => {
-    const [postFormData, setPostFormData] = useState({
-        category: {
-            cateName:"일상",  // 기본 카테고리 ID
-        },
+const BoardCreate: React.FC = () => {
+    const [postFormData, setPostFormData] = useState<PostFormData>({
+        category: {cateName: "일상"},
         title: '',
-        content: '',
+        content: ''
     });
-
     const [categories, setCategories] = useState<Category[]>([]);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const { isLoggedIn, user } = useUserStore();
+    const {isLoggedIn, user} = useUserStore();
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8080/api/board/categories');
+                const response = await axios.get<Category[]>('http://127.0.0.1:8080/api/board/categories');
                 setCategories(response.data);
-
-                // 카테고리가 있을 경우, 기본적으로 첫 번째 카테고리로 설정
                 if (response.data.length > 0) {
-                    setPostFormData(prev => ({
-                        ...prev,
-                        category: { cateName: response.data[0].cateName }
-                    }));
+                    setPostFormData(prev => ({...prev, category: response.data[0]}));
                 }
             } catch (error) {
                 console.log("카테고리 목록을 가져오는 데 오류가 발생했습니다.", error);
@@ -50,21 +35,18 @@ const BoardCreate = () => {
         fetchCategories();
     }, []);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            setSelectedFile(event.target.files[0]);
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) { // event 대신 e로 변경
+            setSelectedFile(e.target.files[0]);
         }
     };
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
+    const handleSubmit = async (e: React.FormEvent) => { // async 추가
+        e.preventDefault(); // preventDefault 적용
         if (!isLoggedIn) {
             toast.error("인증이 필요합니다. 다시 로그인해 주세요.");
             return;
         }
-
-        // 카테고리 선택 확인
         if (!postFormData.category.cateName) {
             toast.error("카테고리를 선택해주세요.");
             return;
@@ -98,89 +80,17 @@ const BoardCreate = () => {
     };
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 4 }}>
-            <Typography variant="h6" gutterBottom>
-                사용자 정보
-            </Typography>
-            <Typography>닉네임: {user?.nickName}</Typography>
-            <Typography>이름: {user?.userName}</Typography>
-
-            <form onSubmit={handleSubmit}>
-                <FormControl fullWidth margin="normal">
-                    <InputLabel id="cate-select-label">카테고리</InputLabel>
-                    <Select
-                        sx={{ marginTop: 2 }}
-                        labelId="cate-select-label"
-                        value={postFormData.category.cateName}  // 현재 선택된 카테고리 값 설정
-                        onChange={(e) => setPostFormData(prev => ({
-                            ...prev,
-                            category: { cateName: (e.target.value) } // Number로 타입 변환
-                        }))}
-                    >
-                        <MenuItem value="default" disabled>
-                            선택하세요.
-                        </MenuItem>
-                        {categories.map((item) => (
-                            <MenuItem key={item.cateName} value={item.cateName}>
-                                {item.cateName}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-
-                <TextField
-                    label="제목"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={postFormData.title}
-                    onChange={(e) => setPostFormData(prev => ({
-                        ...prev,
-                        title: e.target.value
-                    }))}
-                    required
-                />
-
-                <TextField
-                    label="내용"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    multiline
-                    rows={4}
-                    value={postFormData.content}
-                    onChange={(e) => setPostFormData(prev => ({
-                        ...prev,
-                        content: e.target.value
-                    }))}
-                    required
-                />
-                <Box display="flex" justifyContent="end">
-                    <Button
-                        variant="outlined"
-                        component="label"
-                        sx={{ marginTop: 2 }}
-                    >
-                        파일 업로드
-                        <input type="file" hidden onChange={handleFileChange} />
-                    </Button>
-                </Box>
-
-                <Box display="flex" justifyContent="space-between" mt={2}>
-                    <Button
-                        variant="outlined"
-                        onClick={() => window.history.back()}
-                    >
-                        뒤로가기
-                    </Button>
-                    <Button
-                        variant="contained"
-                        type="submit"
-                    >
-                        등록
-                    </Button>
-                </Box>
-            </form>
+        <Container maxWidth="sm" sx={{mt: 4}}>
+            <UserInfo user={user}/>
+            <PostForm
+                postFormData={postFormData}
+                user={user}
+                categories={categories}
+                handleSubmit={handleSubmit}
+                handleFileChange={handleFileChange}
+                setPostFormData={setPostFormData}
+                submitLabel="등록"
+            />
         </Container>
     );
 };
