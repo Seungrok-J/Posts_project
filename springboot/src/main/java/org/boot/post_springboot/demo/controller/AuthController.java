@@ -1,6 +1,8 @@
 package org.boot.post_springboot.demo.controller;
 
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.boot.post_springboot.demo.domain.User;
@@ -16,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -73,7 +74,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDTO loginDto, HttpSession session) {
+    public ResponseEntity<?> login(@RequestBody UserDTO loginDto, HttpSession session,  HttpServletResponse response) {
         try {
             // 비밀번호 복호화
             String decryptedPassword = authService.decryptPassword(loginDto.getPassword());
@@ -105,8 +106,17 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             // 4. 세션 처리
+            String sessionId = session.getId();
+            userService.saveSession(sessionId, user.getUserEmail());
             session.setAttribute("USER", user);
-            log.info("로그인 성공: 유저={}, 세션ID={}", user.getUserEmail(), session.getId());
+            log.info("로그인 성공: 유저={}, 세션ID={}", user.getUserEmail(), sessionId);
+
+            // 세션 ID를 쿠키에 저장
+            Cookie sessionCookie = new Cookie("Session_ID", sessionId);
+            sessionCookie.setHttpOnly(true);
+            sessionCookie.setPath("/");
+            sessionCookie.setMaxAge(3600); // 1시간 유효
+            response.addCookie(sessionCookie);
 
             // 5. 응답 생성
             UserDTO responseDTO = new UserDTO(user);
@@ -122,11 +132,36 @@ public class AuthController {
 
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
+    public ResponseEntity<?> logout(
+            @CookieValue(name = "Session_ID", required = false) String sessionId,
+            HttpSession session,
+            HttpServletResponse response,
+            Authentication authentication
+    ) {
+        String userEmail = (authentication != null) ? authentication.getName() : "Unknown";
+        log.info("로그아웃 시도: 유저={}, 세션ID={}", userEmail, sessionId);
+
+        // 세션 ID가 없으면 현재 세션 ID 사용
+        if (sessionId == null) {
+            sessionId = session.getId();
+        }
+
+        // 세션 무효화
+        userService.invalidateSession(sessionId);
         SecurityContextHolder.clearContext();
         session.invalidate();
+
+        // 세션 쿠키 삭제
+        Cookie sessionCookie = new Cookie("Session_ID", "");
+        sessionCookie.setHttpOnly(true);
+        sessionCookie.setPath("/");
+        sessionCookie.setMaxAge(0);
+        response.addCookie(sessionCookie);
+
+        log.info("로그아웃 성공: 유저={}, 세션ID={}", userEmail, sessionId);
         return ResponseEntity.ok().body("Successfully logged out");
     }
+
 }
 
 

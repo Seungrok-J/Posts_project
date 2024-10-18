@@ -1,14 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import {User} from '../@types/formTypes'
 
-interface User {
-    userId: string; // 식별자로 사용
-    userName: string;
-    nickName: string;
-    userEmail: string;
-    sessionId: string;
-    role:string;
-}
 
 interface UserState {
     isLoggedIn: boolean;

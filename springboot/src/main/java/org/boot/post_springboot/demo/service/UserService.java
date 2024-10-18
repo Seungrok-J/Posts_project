@@ -5,6 +5,7 @@ import org.boot.post_springboot.demo.domain.User;
 import org.boot.post_springboot.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -20,6 +22,8 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -76,4 +80,22 @@ public class UserService implements UserDetailsService {
 //    public String encodePassword(String password) {
 //        return passwordEncoder.encode(password);
 //    }
+
+
+
+    public boolean isValidSession(String sessionId) {
+        return redisTemplate.hasKey(sessionId);
+    }
+
+    public void saveSession(String sessionId, String userEmail) {
+        redisTemplate.opsForValue().set(sessionId, userEmail, 30, TimeUnit.MINUTES);
+    }
+
+    public void invalidateSession(String sessionId) {
+        redisTemplate.delete(sessionId);
+    }
+    public String getUserEmailFromSession(String sessionId) {
+        return redisTemplate.opsForValue().get(sessionId);
+    }
+
 }
