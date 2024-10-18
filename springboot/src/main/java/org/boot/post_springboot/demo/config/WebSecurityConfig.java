@@ -3,6 +3,9 @@ package org.boot.post_springboot.demo.config;
 
 import org.boot.post_springboot.demo.security.CustomUserDetailsService;
 
+import org.boot.post_springboot.demo.security.SessionAuthenticationFilter;
+import org.boot.post_springboot.demo.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -13,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -23,9 +27,12 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class WebSecurityConfig {
     private final CustomUserDetailsService userDetailsService;
+    private final SessionAuthenticationFilter sessionAuthenticationFilter;
 
-    public WebSecurityConfig(@Lazy CustomUserDetailsService userDetailsService) {
+    public WebSecurityConfig(@Lazy CustomUserDetailsService userDetailsService,
+                             SessionAuthenticationFilter sessionAuthenticationFilter) {
         this.userDetailsService = userDetailsService;
+        this.sessionAuthenticationFilter = sessionAuthenticationFilter;
     }
 
     @Bean
@@ -52,9 +59,13 @@ public class WebSecurityConfig {
                         .requestMatchers("/", "/home", "/public/**", "/api/emailCheck", "/api/verifyToken", "/api/auth/**", "/api/board/**").permitAll()
                         .anyRequest().permitAll())
                 .formLogin(login -> login.disable())
-                .httpBasic(basic -> basic.disable());
+                .httpBasic(basic -> basic.disable())
+                .addFilterBefore(sessionAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

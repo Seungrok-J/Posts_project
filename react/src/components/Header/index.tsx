@@ -1,16 +1,13 @@
 import React from "react";
-import {Link, useNavigate} from "react-router-dom";
+import {Link} from "react-router-dom";
 import { PATH } from "../../constants/paths";
 import useUserStore from "../../store/useUserStore";
+import useLogout from "../../hooks/useLogout";
 
 const AppHeader: React.FC = () => {
-    const { isLoggedIn, logout, user } = useUserStore();
-    const navigate = useNavigate();
+    const { isLoggedIn, user } = useUserStore();
 
-    const handleLogout = () => {
-        logout();
-        navigate(PATH.HOME);
-    }
+    const handleLogout = useLogout();
 
     return (
         <header className="bg-gray-800 text-white p-4">
